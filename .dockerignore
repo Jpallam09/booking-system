@@ -1,0 +1,26 @@
+# Dependencies & Build artifacts
+**/node_modules
+**/vendor
+**/dist
+**/build
+**/public/build
+**/public/hot
+
+# Environment variables & Local configurations
+**/.env
+**/.env.*
+!.env.example
+
+# Git & Version Control
+**/.git
+**/.github
+
+# Logs & Temporary files
+**/storage/*.key
+**/storage/logs/*
+**/*.log
+.DS_Store
+
+# Docker files
+Dockerfile*
+docker-compose*

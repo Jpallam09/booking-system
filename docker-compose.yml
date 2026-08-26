@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: booking_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: booking_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: booking_user
+      MYSQL_PASSWORD: secretpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: booking_backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=booking_db
+      - DB_USERNAME=booking_user
+      - DB_PASSWORD=secretpassword
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

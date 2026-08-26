@@ -1,0 +1,26 @@
+{
+  "name": "booking-system",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "dev": "concurrently \"pnpm docker:up\" \"pnpm dev:frontend\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.22.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
