@@ -12,10 +12,18 @@ Root uses **pnpm** workspaces. Docker Compose runs MySQL + backend.
 
 ### Root (from `/home/jpvrcm/Documents/booking-system`)
 ```bash
-pnpm dev              # Start docker + frontend dev server
+pnpm dev              # Frontend dev server only
+pnpm dev:all          # Start docker (MySQL+backend) + frontend dev server
 pnpm docker:up        # Start MySQL + backend containers
 pnpm docker:down      # Stop containers
-pnpm dev:frontend     # Frontend dev server only
+pnpm docker:logs      # Follow docker logs
+pnpm backend:shell    # Bash shell inside the backend container
+pnpm php:artisan      # Run `php artisan` inside backend container
+pnpm php:migrate      # Run migrations
+pnpm php:seed         # Run database seeder
+pnpm php:fresh        # Fresh migrate (drop + migrate)
+pnpm php:composer     # Run composer inside backend container
+pnpm php:routes       # List API routes
 ```
 
 ### Backend (from `backend/`)
@@ -62,4 +70,4 @@ pnpm format           # Prettier
 - Backend `npm run dev` only compiles assets; use `composer dev` for Laravel server
 - Docker Compose mounts `./backend` → `/var/www/html` (hot reload works)
 - Frontend expects backend at `localhost:8000`; CORS configured in `backend/config/cors.php`
-- Run `pnpm docker:up` before `pnpm dev:frontend` for full stack
+- Run `pnpm docker:up` before `pnpm dev` (or use `pnpm dev:all`) for full stack
