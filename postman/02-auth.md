@@ -19,10 +19,13 @@ Accept: application/json
   "email": "juandelacruz@example.com",
   "password": "password123",
   "password_confirmation": "password123",
-  "role": "patient",
   "phone": "09123456789"
 }
 ```
+
+Notes:
+- Account created is always `patient` role (role cannot be set via API).
+- Use the seeded admin/dentist accounts (see `01-overview.md`) to test other roles.
 
 ## 2. Login User
 
