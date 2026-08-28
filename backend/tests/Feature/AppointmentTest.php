@@ -75,6 +75,68 @@ class AppointmentTest extends TestCase
             ->assertJsonCount(1, 'data.data');
     }
 
+    public function test_list_filters_by_service(): void
+    {
+        $this->actingAsRole(UserRole::Admin);
+        $service = $this->makeService();
+        $other = Service::factory()->create();
+
+        Appointment::factory()->create(['service_id' => $service->id]);
+        Appointment::factory()->create(['service_id' => $other->id]);
+
+        $this->getJson("/api/appointments?service_id={$service->id}")
+            ->assertOk()
+            ->assertJsonCount(1, 'data.data');
+    }
+
+    public function test_list_searches_by_dental_concern(): void
+    {
+        $this->actingAsRole(UserRole::Admin);
+        $service = $this->makeService();
+
+        Appointment::factory()->create([
+            'service_id' => $service->id,
+            'dental_concern' => 'Toothache in lower molar',
+        ]);
+        Appointment::factory()->create([
+            'service_id' => $service->id,
+            'dental_concern' => 'Routine cleaning',
+        ]);
+
+        $this->getJson('/api/appointments?search=toothache')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.data');
+    }
+
+    public function test_list_searches_by_service_title(): void
+    {
+        $this->actingAsRole(UserRole::Admin);
+        $matching = Service::factory()->create(['title' => 'Root Canal Treatment']);
+        $other = Service::factory()->create(['title' => 'Teeth Whitening']);
+
+        Appointment::factory()->create(['service_id' => $matching->id]);
+        Appointment::factory()->create(['service_id' => $other->id]);
+
+        $this->getJson('/api/appointments?search=root%20canal')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.data');
+    }
+
+    public function test_list_searches_by_patient_name(): void
+    {
+        $this->actingAsRole(UserRole::Admin);
+        $service = $this->makeService();
+        $patient = User::factory()->create(['name' => 'Jane Doe', 'role' => UserRole::Patient]);
+        $other = User::factory()->create(['name' => 'John Smith', 'role' => UserRole::Patient]);
+
+        Appointment::factory()->create(['patient_id' => $patient->id, 'service_id' => $service->id]);
+        Appointment::factory()->create(['patient_id' => $other->id, 'service_id' => $service->id]);
+
+        $this->getJson('/api/appointments?search=jane')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.data');
+    }
+
     public function test_only_patients_can_book(): void
     {
         $this->actingAsRole(UserRole::Admin);

@@ -33,6 +33,15 @@ class AppointmentService
             $query->where('service_id', $filters['service_id']);
         }
 
+        if (!empty($filters['search'])) {
+            $term = $filters['search'];
+            $query->where(function ($q) use ($term) {
+                $q->whereLike('dental_concern', "%{$term}%")
+                  ->orWhereHas('patient', fn ($pq) => $pq->whereLike('name', "%{$term}%"))
+                  ->orWhereHas('service', fn ($sq) => $sq->whereLike('title', "%{$term}%"));
+            });
+        }
+
         if (!empty($filters['from'])) {
             $query->where('appointment_date', '>=', $filters['from']);
         }

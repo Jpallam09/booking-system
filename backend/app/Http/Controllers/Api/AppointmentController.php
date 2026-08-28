@@ -22,7 +22,7 @@ class AppointmentController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['status', 'service_id', 'from', 'to']);
+        $filters = $request->only(['status', 'service_id', 'from', 'to', 'search']);
 
         return response()->json([
             'success' => true,
