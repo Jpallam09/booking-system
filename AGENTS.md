@@ -24,6 +24,8 @@ pnpm php:seed         # Run database seeder
 pnpm php:fresh        # Fresh migrate (drop + migrate)
 pnpm php:composer     # Run composer inside backend container
 pnpm php:routes       # List API routes
+pnpm php:test         # Run backend tests inside container
+pnpm test             # Run backend tests (alias of php:test)
 ```
 
 ### Backend (from `backend/`)

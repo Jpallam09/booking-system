@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\AppointmentStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Appointment extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'patient_id', 'dentist_id', 'service_id', 'appointment_date',
         'status', 'dental_concern', 'treatment_notes', 'cancellation_reason', 'cancelled_by'

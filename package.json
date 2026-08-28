@@ -15,7 +15,9 @@
     "php:fresh": "docker exec -it booking_backend php artisan migrate:fresh",
     "php:composer": "docker exec -it booking_backend composer",
     "backend:shell": "docker exec -it booking_backend bash",
-    "php:routes": "docker exec -it booking_backend php artisan route:list --path=api"
+    "php:routes": "docker exec -it booking_backend php artisan route:list --path=api",
+    "php:test": "docker exec -it booking_backend php artisan test",
+    "test": "docker exec -it booking_backend php artisan test"
   },
   "keywords": [],
   "author": "John Paul Allam",

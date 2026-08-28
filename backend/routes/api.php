@@ -17,7 +17,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/appointments', [AppointmentController::class, 'index']);
     Route::post('/appointments', [AppointmentController::class, 'store']);
+    Route::get('/appointments/{appointment}', [AppointmentController::class, 'show']);
+    Route::put('/appointments/{appointment}', [AppointmentController::class, 'update']);
+    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy']);
+    Route::post('/appointments/{appointment}/assign-dentist', [AppointmentController::class, 'assignDentist']);
+    Route::post('/appointments/{appointment}/confirm', [AppointmentController::class, 'confirm']);
+    Route::post('/appointments/{appointment}/complete', [AppointmentController::class, 'complete']);
+    Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
 
     Route::get('/services', [ServiceController::class, 'index']);
     Route::post('/services', [ServiceController::class, 'store']);
+    Route::get('/services/{service}', [ServiceController::class, 'show']);
+    Route::put('/services/{service}', [ServiceController::class, 'update']);
+    Route::delete('/services/{service}', [ServiceController::class, 'destroy']);
 });
