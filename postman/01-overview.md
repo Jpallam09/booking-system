@@ -10,6 +10,14 @@
 * `Accept: application/json`
 * `Authorization: Bearer <your_token>` *(Required for protected routes)*
 
+## Postman Setup
+
+1. Create a Postman Environment with variables:
+   - `base_url` = `http://localhost:8000/api`
+   - `token` = *(blank, updated after login)*
+2. Call `POST /register` or `POST /login`, copy the returned `token`.
+3. Set `token` to that value, and use `Authorization: Bearer {{token}}` on protected routes.
+
 ## Seeded Accounts (via seeder)
 
 Login with these to test each role:
