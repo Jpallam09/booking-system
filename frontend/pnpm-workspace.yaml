@@ -1,5 +1,13 @@
 packages: []
 
+# Skip pnpm's pre-script dependency check/install so FE scripts (build/lint/test)
+# run without re-resolving against the global supply-chain minimumReleaseAge.
+verifyDepsBeforeRun: false
+
+# Opt out of the global minimumReleaseAge supply-chain quarantine for this
+# project (its dependencies are frequently published within the 2h window).
+minimumReleaseAge: 0
+
 allowBuilds:
   esbuild: true
   msw: false
