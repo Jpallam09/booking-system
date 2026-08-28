@@ -26,7 +26,7 @@ QA covers **backend API behaviour**, **frontend UI flows**, **security**, and
 |-------|-----------------|-------|
 | Unit (frontend) | Vitest + Testing Library + jsdom | `frontend/src/**/__tests__/*.test.ts` |
 | Feature/Integration (backend) | PHPUnit (Laravel `php artisan test`) | `backend/tests/Feature/*Test.php` |
-| API (manual) | Postman collection | `postman/Booking-System.postman_collection.json` |
+| API (manual) | Postman collection | `docs/postman/Booking-System.postman_collection.json` |
 | End-to-end (manual UI) | Browser against `:5173` | documented in `04-happy-path.md` |
 | Security (API) | Manual adversarial checks | `06-penetration.md` |
 

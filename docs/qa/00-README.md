@@ -28,7 +28,7 @@ backend, MySQL database).
 * **Backend tests** (run inside Docker):
   `docker compose exec -T backend php artisan test`
 * **Frontend tests:** `pnpm test` (from `frontend/`)
-* **Postman collection:** `postman/Booking-System.postman_collection.json`
+* **Postman collection:** `docs/postman/Booking-System.postman_collection.json`
 
 ## Conventions Used
 
@@ -43,4 +43,4 @@ backend, MySQL database).
 2. Seed the database: `pnpm php:seed`.
 3. Backend automated tests: `pnpm test` (alias of `php:test` → `docker compose exec -T backend php artisan test`).
 4. Frontend automated tests: `cd frontend && pnpm test`.
-5. Manual API testing: import `postman/Booking-System.postman_collection.json` into Postman.
+5. Manual API testing: import `docs/postman/Booking-System.postman_collection.json` into Postman.
