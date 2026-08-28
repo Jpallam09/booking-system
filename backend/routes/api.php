@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Public service catalog (read-only for guests on the landing page)
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{service}', [ServiceController::class, 'show']);
+
 // Protected Routes (Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -25,9 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/appointments/{appointment}/complete', [AppointmentController::class, 'complete']);
     Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel']);
 
-    Route::get('/services', [ServiceController::class, 'index']);
     Route::post('/services', [ServiceController::class, 'store']);
-    Route::get('/services/{service}', [ServiceController::class, 'show']);
     Route::put('/services/{service}', [ServiceController::class, 'update']);
     Route::delete('/services/{service}', [ServiceController::class, 'destroy']);
 });

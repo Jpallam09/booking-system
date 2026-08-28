@@ -20,9 +20,23 @@ class ServiceTest extends TestCase
         return $user;
     }
 
-    public function test_list_services_requires_authentication(): void
+    public function test_list_services_is_public(): void
     {
-        $this->getJson('/api/services')->assertStatus(401);
+        Service::factory()->count(3)->create();
+
+        $this->getJson('/api/services')
+            ->assertOk()
+            ->assertJsonCount(3, 'data.data')
+            ->assertJsonStructure(['success', 'data' => ['data']]);
+    }
+
+    public function test_show_service_is_public(): void
+    {
+        $service = Service::factory()->create(['title' => 'Public Consultation']);
+
+        $this->getJson("/api/services/{$service->id}")
+            ->assertOk()
+            ->assertJsonPath('data.title', 'Public Consultation');
     }
 
     public function test_index_returns_paginated_services(): void
