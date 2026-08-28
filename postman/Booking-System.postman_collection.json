@@ -1,0 +1,382 @@
+{
+  "info": {
+    "name": "Booking System API",
+    "description": "Dental-clinic booking system REST API. Base URL: http://localhost:8000/api. Login sets the {{token}} environment variable automatically (see the Login request test script). Seeded users: admin@example.com / dentist@example.com / patient@example.com (all password123).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Maria Santos\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"09170000000\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Register a new patient account. Returns { message, data: { user }, token }."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Log in. The test script stores the returned token as {{token}}."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.environment.set('token', json.token);",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "}",
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has token', () => pm.expect(json.token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/user",
+              "host": ["{{base_url}}"],
+              "path": ["user"]
+            },
+            "description": "Returns the authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": ["{{base_url}}"],
+              "path": ["logout"]
+            },
+            "description": "Revokes the current token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "List Appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments?status=&search=",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"],
+              "query": [
+                { "key": "status", "value": "", "disabled": true },
+                { "key": "service_id", "value": "", "disabled": true },
+                { "key": "from", "value": "", "disabled": true },
+                { "key": "to", "value": "", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            },
+            "description": "Role-scoped list, paginated 10/page. Filters: status, service_id, from, to, search."
+          },
+          "response": []
+        },
+        {
+          "name": "Book Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_id\": 1,\n  \"appointment_date\": \"2026-09-01 10:00:00\",\n  \"dental_concern\": \"Toothache on lower right molar\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Patient books an appointment."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Appointment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "View a single appointment. Set {{appointment_id}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointment_date\": \"2026-09-02 11:00:00\",\n  \"dental_concern\": \"Updated concern\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Appointment (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Dentist (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/assign-dentist",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "assign-dentist"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dentist_id\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Admin assigns a dentist. dentist_id must reference a dentist-role user."
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "confirm"]
+            },
+            "description": "Admin or the assigned dentist."
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/complete",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "complete"]
+            },
+            "description": "Admin or the assigned dentist."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "cancel"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cancellation_reason\": \"Change of plans\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Owning patient or admin; cancellation_reason required."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "List Services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services",
+              "host": ["{{base_url}}"],
+              "path": ["services"]
+            },
+            "description": "Authenticated (auth-protected) service list."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Service (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/services",
+              "host": ["{{base_url}}"],
+              "path": ["services"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Teeth Whitening\",\n  \"description\": \"Professional whitening session\",\n  \"price\": 150\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Service (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Teeth Whitening (Updated)\",\n  \"description\": \"Updated description\",\n  \"price\": 175\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Service (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/services/{{service_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["services", "{{service_id}}"]
+            },
+            "description": "Admin only."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
