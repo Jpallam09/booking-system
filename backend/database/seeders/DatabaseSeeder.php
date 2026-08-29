@@ -24,16 +24,24 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. Create Dentist Account
-        User::updateOrCreate(
-            ['email' => 'dentist@example.com'],
-            [
-                'name' => 'Dr. Smith',
-                'password' => Hash::make('password123'),
-                'role' => 'dentist',
-                'phone' => '09123456789',
-            ]
-        );
+        // 2. Create Dentist Accounts
+        $dentists = [
+            ['name' => 'Dentist 1', 'phone' => '09123456780'],
+            ['name' => 'Dentist 2', 'phone' => '09123456781'],
+            ['name' => 'Dentist 3', 'phone' => '09123456782'],
+        ];
+
+        foreach ($dentists as $i => $dentist) {
+            User::updateOrCreate(
+                ['email' => 'dentist'.($i + 1).'@example.com'],
+                [
+                    'name' => $dentist['name'],
+                    'password' => Hash::make('password123'),
+                    'role' => 'dentist',
+                    'phone' => $dentist['phone'],
+                ]
+            );
+        }
 
         // 3. Create Patient Account
         User::updateOrCreate(

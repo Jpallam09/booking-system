@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 
@@ -9,7 +9,9 @@ import {
   confirmAppointment,
   deleteAppointment,
   getAppointment,
+  updateAppointment,
 } from "@/api/appointments"
+import { listUsers } from "@/api/users"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +23,13 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useAuth } from "@/context/AuthContext"
 import { formatDate } from "@/lib/format"
 import type { AppointmentStatus } from "@/lib/types"
@@ -35,6 +44,17 @@ const STATUS_COLORS: Record<
   cancelled: "destructive",
 }
 
+function toDateTimeLocal(date: Date): string {
+  const offsetMs = date.getTimezoneOffset() * 60000
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
+}
+
+function isoToDateTimeLocal(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value.slice(0, 16)
+  return toDateTimeLocal(date)
+}
+
 export function AppointmentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const appointmentId = Number(id)
@@ -43,6 +63,7 @@ export function AppointmentDetailPage() {
 
   const [cancellationReason, setCancellationReason] = useState("")
   const [dentistId, setDentistId] = useState("")
+  const [rescheduleDate, setRescheduleDate] = useState("")
 
   const { data: appointment, isLoading } = useQuery({
     queryKey: ["appointment", appointmentId],
@@ -50,10 +71,29 @@ export function AppointmentDetailPage() {
     enabled: !Number.isNaN(appointmentId),
   })
 
+  const dentistsQuery = useQuery({
+    queryKey: ["users", "dentists"],
+    queryFn: () => listUsers({ role: "dentist" }),
+    enabled: user?.role === "admin",
+  })
+  const dentists = dentistsQuery.data ?? []
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["appointment", appointmentId] })
     queryClient.invalidateQueries({ queryKey: ["appointments"] })
   }
+
+  useEffect(() => {
+    if (appointment && dentistId === "" && appointment.dentist_id != null) {
+      setDentistId(String(appointment.dentist_id))
+    }
+  }, [appointment, dentistId])
+
+  useEffect(() => {
+    if (appointment && rescheduleDate === "") {
+      setRescheduleDate(isoToDateTimeLocal(appointment.appointment_date))
+    }
+  }, [appointment, rescheduleDate])
 
   const confirmMutation = useMutation({
     mutationFn: () => confirmAppointment(appointmentId),
@@ -62,6 +102,16 @@ export function AppointmentDetailPage() {
   const completeMutation = useMutation({
     mutationFn: () => completeAppointment(appointmentId),
     onSuccess: invalidate,
+  })
+  const rescheduleMutation = useMutation({
+    mutationFn: () =>
+      updateAppointment(appointmentId, {
+        appointment_date: rescheduleDate,
+      }),
+    onSuccess: () => {
+      setRescheduleDate("")
+      invalidate()
+    },
   })
   const cancelMutation = useMutation({
     mutationFn: () => cancelAppointment(appointmentId, cancellationReason),
@@ -72,10 +122,7 @@ export function AppointmentDetailPage() {
   })
   const assignMutation = useMutation({
     mutationFn: () => assignDentist(appointmentId, Number(dentistId)),
-    onSuccess: () => {
-      setDentistId("")
-      invalidate()
-    },
+    onSuccess: () => invalidate(),
   })
   const deleteMutation = useMutation({
     mutationFn: () => deleteAppointment(appointmentId),
@@ -87,19 +134,22 @@ export function AppointmentDetailPage() {
   if (isLoading) return <p>Loading...</p>
   if (!appointment) return <p>Appointment not found.</p>
 
+  const isOwner = user?.role === "patient" && appointment.patient_id === user.id
+  const isAdmin = user?.role === "admin"
+  const canEdit = isAdmin || isOwner
   const canConfirm =
-    (user?.role === "admin" ||
+    (isAdmin ||
       (user?.role === "dentist" && appointment.dentist_id === user.id)) &&
     appointment.status === "pending"
 
   const canComplete = canConfirm && appointment.status === "confirmed"
 
-  const canCancel =
-    user?.role === "admin" ||
-    (user?.role === "patient" && appointment.patient_id === user.id)
+  const canCancel = canEdit && appointment.status !== "cancelled"
 
-  const canAssign = user?.role === "admin"
-  const canDelete = user?.role === "admin"
+  const canAssign = isAdmin
+  const canDelete = isAdmin
+
+  const minReschedule = toDateTimeLocal(new Date(Date.now() + 60 * 60 * 1000))
 
   return (
     <div className="grid max-w-2xl gap-6">
@@ -186,7 +236,75 @@ export function AppointmentDetailPage() {
         </Card>
       )}
 
-      {canCancel && appointment.status !== "cancelled" && (
+      {canAssign && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Assign Dentist</CardTitle>
+            <CardDescription>
+              Assign a dentist to this appointment.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            <div className="grid gap-2">
+              <Label htmlFor="dentist">Dentist</Label>
+              <Select
+                value={dentistId || undefined}
+                onValueChange={(v) => setDentistId(String(v ?? ""))}
+              >
+                <SelectTrigger id="dentist" className="w-full">
+                  <SelectValue placeholder="Select a dentist" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dentists.map((dentist) => (
+                    <SelectItem key={dentist.id} value={String(dentist.id)}>
+                      {dentist.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              onClick={() => assignMutation.mutate()}
+              disabled={assignMutation.isPending || !dentistId}
+            >
+              {appointment.dentist_id ? "Reassign Dentist" : "Assign Dentist"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {canEdit &&
+        appointment.status !== "completed" &&
+        appointment.status !== "cancelled" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Reschedule</CardTitle>
+              <CardDescription>
+                Change the appointment date and time.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <div className="grid gap-2">
+                <Label htmlFor="reschedule_date">New Date &amp; Time</Label>
+                <Input
+                  id="reschedule_date"
+                  type="datetime-local"
+                  min={minReschedule}
+                  value={rescheduleDate}
+                  onChange={(e) => setRescheduleDate(e.target.value)}
+                />
+              </div>
+              <Button
+                onClick={() => rescheduleMutation.mutate()}
+                disabled={rescheduleMutation.isPending || !rescheduleDate}
+              >
+                Save Reschedule
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+      {canCancel && (
         <Card>
           <CardHeader>
             <CardTitle>Cancel Appointment</CardTitle>
@@ -204,38 +322,9 @@ export function AppointmentDetailPage() {
             <Button
               variant="destructive"
               onClick={() => cancelMutation.mutate()}
-              disabled={cancelMutation.isPending || !cancellationReason}
+              disabled={cancelMutation.isPending || !cancellationReason.trim()}
             >
               Cancel Appointment
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {canAssign && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Assign Dentist</CardTitle>
-            <CardDescription>
-              Enter the dentist user ID to assign them to this appointment.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="dentist_id">Dentist ID</Label>
-              <Input
-                id="dentist_id"
-                type="number"
-                placeholder="e.g. 2"
-                value={dentistId}
-                onChange={(e) => setDentistId(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={() => assignMutation.mutate()}
-              disabled={assignMutation.isPending || !dentistId}
-            >
-              Assign Dentist
             </Button>
           </CardContent>
         </Card>

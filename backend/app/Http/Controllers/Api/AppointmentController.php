@@ -123,14 +123,14 @@ class AppointmentController extends Controller
     public function cancel(Request $request, Appointment $appointment)
     {
         $validated = $request->validate([
-            'cancellation_reason' => 'required|string|max:500',
+            'cancellation_reason' => 'required|string|max:500|not_regex:/^\s*$/',
         ]);
 
         $appointment = $this->appointmentService->changeStatus(
             $appointment,
             AppointmentStatus::Cancelled,
             $request->user(),
-            $validated['cancellation_reason']
+            trim($validated['cancellation_reason'])
         );
 
         return $this->statusResponse($appointment, 'Appointment cancelled.');

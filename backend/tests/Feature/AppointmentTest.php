@@ -324,4 +324,27 @@ class AppointmentTest extends TestCase
 
         $this->postJson("/api/appointments/{$appointment->id}/cancel")->assertUnprocessable();
     }
+
+    public function test_cancel_rejects_blank_reason(): void
+    {
+        $patient = $this->actingAsRole(UserRole::Patient);
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create(['patient_id' => $patient->id, 'service_id' => $service->id]);
+
+        $this->postJson("/api/appointments/{$appointment->id}/cancel", ['cancellation_reason' => '   '])
+            ->assertUnprocessable();
+    }
+
+    public function test_admin_can_cancel_appointment_with_reason(): void
+    {
+        $admin = $this->actingAsRole(UserRole::Admin);
+        $patient = User::factory()->role(UserRole::Patient)->create();
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create(['patient_id' => $patient->id, 'service_id' => $service->id]);
+
+        $this->postJson("/api/appointments/{$appointment->id}/cancel", ['cancellation_reason' => 'Dentist unavailable'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'cancelled')
+            ->assertJsonPath('data.cancelled_by', $admin->name);
+    }
 }
