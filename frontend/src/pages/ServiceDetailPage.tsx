@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/context/AuthContext"
+import { formatCurrency } from "@/lib/format"
 
 export function ServiceDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -229,7 +230,7 @@ export function ServiceDetailPage() {
             </div>
             <div className="flex justify-between border-t pt-3">
               <span className="text-muted-foreground">Price</span>
-              <span>${Number(service.price).toFixed(2)}</span>
+              <span>{formatCurrency(service.price)}</span>
             </div>
             <div className="flex justify-between border-t pt-3">
               <span className="text-muted-foreground">Duration</span>

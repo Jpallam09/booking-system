@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\AppointmentStatus;
-use App\Models\Appointment;
-use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -49,23 +46,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 4. Seed demo services
-        if (Service::count() === 0) {
-            Service::factory()->count(10)->create();
-        }
-
-        // 5. Seed a few demo appointments
-        if (Appointment::count() === 0) {
-            $patient = User::where('email', 'patient@example.com')->first();
-            $dentist = User::where('email', 'dentist@example.com')->first();
-
-            if ($patient && Service::exists()) {
-                Appointment::factory()->count(5)->create([
-                    'patient_id' => $patient->id,
-                    'dentist_id' => $dentist?->id,
-                    'status' => AppointmentStatus::Pending,
-                ]);
-            }
-        }
+        // 4. Seed curated dental services
+        $this->call(ServiceSeeder::class);
     }
 }

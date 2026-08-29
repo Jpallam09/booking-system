@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { formatCurrency } from "@/lib/format"
 import type { Service } from "@/lib/types"
 
 interface ServiceCardProps {
@@ -30,7 +31,7 @@ export function ServiceCard({ service, showAction = true }: ServiceCardProps) {
           </Badge>
         </div>
         <CardDescription className="text-base font-semibold text-foreground">
-          ${Number(service.price).toFixed(2)}
+          {formatCurrency(service.price)}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-1">

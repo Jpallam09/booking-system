@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { clearBookingDraft, getBookingDraft } from "@/lib/auth"
+import { formatCurrency } from "@/lib/format"
 import type { Service } from "@/lib/types"
 
 function toDateTimeLocal(date: Date): string {
@@ -106,7 +107,7 @@ export function AppointmentBookingForm() {
               <SelectContent>
                 {services.map((service) => (
                   <SelectItem key={service.id} value={String(service.id)}>
-                    {service.title} - ${Number(service.price).toFixed(2)}
+                    {service.title} - {formatCurrency(service.price)}
                   </SelectItem>
                 ))}
               </SelectContent>

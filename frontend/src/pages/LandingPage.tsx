@@ -8,7 +8,6 @@ import {
   Quote,
   RefreshCcw,
   ShieldCheck,
-  Sparkles,
   Star,
 } from "lucide-react"
 
@@ -149,11 +148,7 @@ export function LandingPage() {
               </Button>
             ) : (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  render={<Link to="/login" />}
-                >
+                <Button variant="ghost" size="sm" render={<Link to="/login" />}>
                   Sign In
                 </Button>
                 <Button size="sm" render={<Link to="/register" />}>
@@ -177,20 +172,18 @@ export function LandingPage() {
           />
 
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:grid-cols-2 md:py-24">
-            <div>              <h1 className="mt-5 font-display text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl">
+            <div>
+              {" "}
+              <h1 className="mt-5 font-display text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl">
                 Modern dental care, booked in seconds.
               </h1>
               <p className="mt-4 max-w-md text-base text-muted-foreground">
                 Browse our services and secure your visit online. Pick a time
                 that suits you and our team will confirm your appointment
-                shortly  no phone calls, no waiting.
+                shortly no phone calls, no waiting.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button
-                  className="px-5"
-                  size="lg"
-                  onClick={handleBookClick}
-                >
+                <Button className="px-5" size="lg" onClick={handleBookClick}>
                   Book an Appointment
                   <ArrowRight className="size-4" />
                 </Button>
@@ -215,9 +208,15 @@ export function LandingPage() {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <span className="flex items-center gap-1" aria-label="Rated 4.9 out of 5 stars">
+                  <span
+                    className="flex items-center gap-1"
+                    aria-label="Rated 4.9 out of 5 stars"
+                  >
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        className="size-4 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </span>
                   <p className="mt-1 text-muted-foreground">
@@ -307,7 +306,10 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="services" className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-16">
+        <section
+          id="services"
+          className="mx-auto max-w-6xl scroll-mt-20 px-4 pb-16"
+        >
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
@@ -317,10 +319,7 @@ export function LandingPage() {
                 From routine check-ups to specialist treatments.
               </p>
             </div>
-            <Button
-              variant="ghost"
-              render={<a href="#" />}
-            >
+            <Button variant="ghost" render={<a href="#" />}>
               View all services
               <ArrowRight className="size-4" />
             </Button>
@@ -344,15 +343,12 @@ export function LandingPage() {
             </div>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {TESTIMONIALS.map((testimonial) => (
-                <Card
-                  key={testimonial.name}
-                  className="p-6 shadow-sm"
-                >
+                <Card key={testimonial.name} className="p-6 shadow-sm">
                   <Quote className="size-6 text-teal-600" />
                   <blockquote className="flex-1 text-sm text-muted-foreground">
                     "{testimonial.quote}"
                   </blockquote>
-<div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
                       className="flex size-9 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-cyan-500 text-xs font-semibold text-white"
@@ -377,7 +373,7 @@ export function LandingPage() {
 
         <section className="mx-auto max-w-6xl px-4 py-16">
           <div className="overflow-hidden bg-gradient-to-tr from-teal-600 to-cyan-600 px-6 py-14 text-center shadow-xl shadow-cyan-900/20 sm:px-12">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-white text-balance sm:text-4xl">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-balance text-white sm:text-4xl">
               Ready to book your next visit?
             </h2>
             <p className="mx-auto mt-3 max-w-md text-white/85">
