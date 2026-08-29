@@ -48,10 +48,15 @@ docker compose exec -T backend php artisan test
 
 Seed via `pnpm php:seed`. Provides:
 
-* `admin@example.com` / `password123` (role `admin`)
-* `dentist@example.com` / `password123` (role `dentist`)
-* `patient@example.com` / `password123` (role `patient`)
-* 10 demo `services`, plus 5 `pending` appointments for the seeded patient.
+* `admin@example.com` / `password123` (role `admin`) — System Admin
+* `dentist1@example.com` / `password123` (role `dentist`) — Dentist 1
+* `dentist2@example.com` / `password123` (role `dentist`) — Dentist 2
+* `dentist3@example.com` / `password123` (role `dentist`) — Dentist 3
+* `patient@example.com` / `password123` (role `patient`) — Juan Dela Cruz
+* 10 demo `services`, all `active`.
+
+> Note: the old `dentist@example.com` account no longer exists — it was replaced
+> by `dentist1/2/3@example.com`.
 
 ## 6. Entry / Exit Criteria
 

@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Booking System API",
-    "description": "Dental-clinic booking system REST API. Base URL: http://localhost:8000/api. Login sets the {{token}} environment variable automatically (see the Login request test script). Seeded users: admin@example.com / dentist@example.com / patient@example.com (all password123).",
+    "description": "Dental-clinic booking system REST API. Base URL: http://localhost:8000/api. Login sets the {{token}} environment variable automatically (see the Login request test script). Seeded users: admin@example.com / patient@example.com / dentist1@example.com / dentist2@example.com / dentist3@example.com (all password123).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

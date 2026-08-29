@@ -32,7 +32,7 @@ Prerequisites: `pnpm docker:up` (MySQL + backend on `:8000`) and `pnpm dev`
 
 ## 3. Dentist happy path
 
-1. Log in as `dentist@example.com` / `password123`.
+1. Log in as `dentist1@example.com` / `password123` (Dentist 1).
 2. **Appointments** shows only appointments assigned to the dentist.
 3. Open one → **Confirm** → **Complete**.
 4. Verify the detail page reflects the new statuses.

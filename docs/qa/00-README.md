@@ -22,9 +22,17 @@ backend, MySQL database).
 
 * **API base URL:** `http://localhost:8000/api`
 * **Frontend URL:** `http://localhost:5173`
-* **Seeded admin:** `admin@example.com` / `password123`
-* **Seeded dentist:** `dentist@example.com` / `password123`
-* **Seeded patient:** `patient@example.com` / `password123`
+
+### Seeded accounts (all passwords `password123`)
+
+| Role | Email | Name |
+|------|-------|------|
+| Admin | `admin@example.com` | System Admin |
+| Dentist | `dentist1@example.com` | Dentist 1 |
+| Dentist | `dentist2@example.com` | Dentist 2 |
+| Dentist | `dentist3@example.com` | Dentist 3 |
+| Patient | `patient@example.com` | Juan Dela Cruz |
+
 * **Backend tests** (run inside Docker):
   `docker compose exec -T backend php artisan test`
 * **Frontend tests:** `pnpm test` (from `frontend/`)

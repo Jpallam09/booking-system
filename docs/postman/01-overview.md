@@ -20,11 +20,18 @@
 
 ## Seeded Accounts (via seeder)
 
-Login with these to test each role:
+Login with these to test each role (all passwords are `password123`):
 
-* **Admin:** `admin@example.com` / `password123`
-* **Dentist:** `dentist@example.com` / `password123`
-* **Patient:** register a new account via the API, or seed one yourself
+| Role | Email | Name |
+|------|-------|------|
+| Admin | `admin@example.com` | System Admin |
+| Dentist | `dentist1@example.com` | Dentist 1 |
+| Dentist | `dentist2@example.com` | Dentist 2 |
+| Dentist | `dentist3@example.com` | Dentist 3 |
+| Patient | `patient@example.com` | Juan Dela Cruz |
+
+> Note: there is no `dentist@example.com` account — dentists are `dentist1/2/3@example.com`.
+> You can also register additional patients via `POST /register`.
 
 ## Testing Tools
 * **Postman Collection:** [Link to your exported collection or JSON]
