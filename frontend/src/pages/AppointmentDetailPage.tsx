@@ -17,6 +17,7 @@ import { DateTimePicker } from "@/components/booking/DateTimePicker"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -146,6 +147,8 @@ export function AppointmentDetailPage() {
   const [dentistId, setDentistId] = useState("")
   const [rescheduleDate, setRescheduleDate] = useState("")
   const [showReassign, setShowReassign] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const { data: appointment, isLoading } = useQuery({
     queryKey: ["appointment", appointmentId],
@@ -248,6 +251,7 @@ export function AppointmentDetailPage() {
         description: extractError(error),
         type: "error",
       }),
+    onSettled: () => setCancelOpen(false),
   })
   const deleteMutation = useMutation({
     mutationFn: () => deleteAppointment(appointmentId),
@@ -261,6 +265,7 @@ export function AppointmentDetailPage() {
         description: extractError(error),
         type: "error",
       }),
+    onSettled: () => setDeleteOpen(false),
   })
 
   if (isLoading) return <p>Loading...</p>
@@ -375,7 +380,7 @@ export function AppointmentDetailPage() {
         </div>
         <Button
           variant="destructive"
-          onClick={() => cancelMutation.mutate()}
+          onClick={() => setCancelOpen(true)}
           disabled={cancelMutation.isPending || !cancellationReason.trim()}
         >
           {cancelMutation.isPending && (
@@ -389,6 +394,15 @@ export function AppointmentDetailPage() {
           </p>
         )}
       </section>
+      <ConfirmDialog
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        title="Cancel appointment?"
+        description={`Cancel the appointment for ${appointment.service?.title ?? "this service"} on ${formatDate(appointment.appointment_date)}? This cannot be undone.`}
+        confirmLabel="Cancel Appointment"
+        pending={cancelMutation.isPending}
+        onConfirm={() => cancelMutation.mutate()}
+      />
     </>
   )
 
@@ -515,13 +529,7 @@ export function AppointmentDetailPage() {
                   </p>
                   <Button
                     variant="destructive"
-                    onClick={() => {
-                      if (
-                        window.confirm("Delete this appointment permanently?")
-                      ) {
-                        deleteMutation.mutate()
-                      }
-                    }}
+                    onClick={() => setDeleteOpen(true)}
                     disabled={deleteMutation.isPending}
                   >
                     {deleteMutation.isPending && (
@@ -530,6 +538,15 @@ export function AppointmentDetailPage() {
                     Delete
                   </Button>
                 </section>
+                <ConfirmDialog
+                  open={deleteOpen}
+                  onOpenChange={setDeleteOpen}
+                  title="Delete appointment?"
+                  description="This permanently removes the appointment from the system. This cannot be undone."
+                  confirmLabel="Delete"
+                  pending={deleteMutation.isPending}
+                  onConfirm={() => deleteMutation.mutate()}
+                />
               </div>
             )}
           </CardContent>
