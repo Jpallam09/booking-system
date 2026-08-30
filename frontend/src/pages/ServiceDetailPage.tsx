@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/toast"
@@ -42,6 +43,7 @@ export function ServiceDetailPage() {
   })
 
   const [activeTab, setActiveTab] = useState<1 | 2 | 3>(1)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [form, setForm] = useState<ServicePayload | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -78,6 +80,7 @@ export function ServiceDetailPage() {
     onSuccess: () => {
       window.location.href = "/services"
     },
+    onSettled: () => setDeleteOpen(false),
   })
 
   if (isLoading) return <p>Loading...</p>
@@ -232,11 +235,7 @@ export function ServiceDetailPage() {
       </p>
       <Button
         variant="destructive"
-        onClick={() => {
-          if (window.confirm("Delete this service?")) {
-            deleteMutation.mutate()
-          }
-        }}
+        onClick={() => setDeleteOpen(true)}
         disabled={deleteMutation.isPending}
       >
         {deleteMutation.isPending && (
@@ -249,6 +248,15 @@ export function ServiceDetailPage() {
           {extractError(deleteMutation.error)}
         </p>
       )}
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Delete service?"
+        description={`Delete ${service.title} from the catalog? This cannot be undone.`}
+        confirmLabel="Delete"
+        pending={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+      />
     </div>
   )
 
