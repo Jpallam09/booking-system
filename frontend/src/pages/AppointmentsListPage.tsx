@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useSearchParams } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 
 import { listAppointments } from "@/api/appointments"
@@ -48,6 +48,7 @@ const STATUS_COLORS: Record<
 
 export function AppointmentsListPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [search, setSearch] = useState(searchParams.get("search") ?? "")
@@ -204,7 +205,6 @@ export function AppointmentsListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Patient</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Date</TableHead>
@@ -214,7 +214,7 @@ export function AppointmentsListPage() {
           <TableBody>
             {appointmentQuery.isLoading && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={4} className="text-center">
                   Loading...
                 </TableCell>
               </TableRow>
@@ -222,7 +222,7 @@ export function AppointmentsListPage() {
             {!appointmentQuery.isLoading && appointments.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={4}
                   className="text-center text-muted-foreground"
                 >
                   No appointments found.
@@ -230,15 +230,19 @@ export function AppointmentsListPage() {
               </TableRow>
             )}
             {appointments.map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell>
-                  <Link
-                    to={`/appointments/${appointment.id}`}
-                    className="text-primary underline underline-offset-4"
-                  >
-                    #{appointment.id}
-                  </Link>
-                </TableCell>
+              <TableRow
+                key={appointment.id}
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/appointments/${appointment.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    navigate(`/appointments/${appointment.id}`)
+                  }
+                }}
+                aria-label={`View appointment for ${appointment.patient?.name ?? "this patient"} on ${formatDate(appointment.appointment_date)}`}
+                className="cursor-pointer"
+              >
                 <TableCell>{appointment.patient?.name ?? "-"}</TableCell>
                 <TableCell>{appointment.service?.title ?? "-"}</TableCell>
                 <TableCell>
