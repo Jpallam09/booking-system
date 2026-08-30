@@ -13,15 +13,10 @@ import {
   updateAppointment,
 } from "@/api/appointments"
 import { listUsers } from "@/api/users"
+import { DateTimePicker } from "@/components/booking/DateTimePicker"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
@@ -34,7 +29,7 @@ import {
 import { toast } from "@/components/ui/toast"
 import { useAuth } from "@/context/AuthContext"
 import { formatDate } from "@/lib/format"
-import type { AppointmentStatus } from "@/lib/types"
+import type { Appointment, AppointmentStatus } from "@/lib/types"
 
 const STATUS_COLORS: Record<
   AppointmentStatus,
@@ -72,6 +67,71 @@ function extractError(error: unknown): string {
   }
   if (error instanceof Error && error.message) return error.message
   return "Something went wrong."
+}
+
+function AppointmentHeader({ appointment }: { appointment: Appointment }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="grid gap-0.5">
+        <h1 className="font-heading text-lg font-semibold">
+          Appointment #{appointment.id}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {formatDate(appointment.appointment_date)}
+        </p>
+      </div>
+      <Badge variant={STATUS_COLORS[appointment.status]}>
+        {appointment.status}
+      </Badge>
+    </div>
+  )
+}
+
+function AppointmentDetails({ appointment }: { appointment: Appointment }) {
+  return (
+    <div className="grid gap-3 border-t pt-4 text-sm">
+      <div className="flex justify-between">
+        <span className="text-muted-foreground">Service</span>
+        <span>{appointment.service?.title ?? "-"}</span>
+      </div>
+      <div className="flex justify-between border-t pt-3">
+        <span className="text-muted-foreground">Patient</span>
+        <span>{appointment.patient?.name ?? "-"}</span>
+      </div>
+      <div className="flex justify-between border-t pt-3">
+        <span className="text-muted-foreground">Dentist</span>
+        <span>{appointment.dentist?.name ?? "Not assigned"}</span>
+      </div>
+      <div className="flex justify-between border-t pt-3">
+        <span className="text-muted-foreground">Dental Concern</span>
+        <span className="text-right">{appointment.dental_concern ?? "-"}</span>
+      </div>
+      {appointment.cancellation_reason && (
+        <div className="grid gap-1 border-t border-destructive/30 bg-destructive/10 p-3 pt-3">
+          <span className="text-xs font-medium text-destructive">
+            Cancellation Reason
+          </span>
+          <p className="text-right">
+            {appointment.cancellation_reason}
+            {appointment.cancelled_by && ` (${appointment.cancelled_by})`}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CancelledCard({ appointment }: { appointment: Appointment }) {
+  return (
+    <div className="mx-auto w-full max-w-xl">
+      <Card>
+        <CardContent className="grid gap-4 pt-6">
+          <AppointmentHeader appointment={appointment} />
+          <AppointmentDetails appointment={appointment} />
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 export function AppointmentDetailPage() {
@@ -206,74 +266,135 @@ export function AppointmentDetailPage() {
   if (isLoading) return <p>Loading...</p>
   if (!appointment) return <p>Appointment not found.</p>
 
-  const isOwner = user?.role === "patient" && appointment.patient_id === user.id
   const isAdmin = user?.role === "admin"
   const assigned = appointment.dentist_id != null
-  const canEdit = isAdmin || isOwner
-  const canConfirm =
-    (isAdmin ||
-      (user?.role === "dentist" && appointment.dentist_id === user.id)) &&
-    appointment.status === "pending"
-  const canComplete = canConfirm && appointment.status === "confirmed"
-  const canCancel = canEdit && appointment.status !== "cancelled"
-  const minReschedule = toDateTimeLocal(new Date(Date.now() + 60 * 60 * 1000))
+  const rescheduleMin = new Date(Date.now() + 60 * 60 * 1000)
+  const isAssignedDentist =
+    user?.role === "dentist" && appointment.dentist_id === user.id
+
+  const confirmPanel = (
+    <div className="grid gap-3">
+      {appointment.status === "completed" ? (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <CheckCircle2Icon className="size-4 text-primary" />
+          This appointment has been completed.
+        </p>
+      ) : appointment.status === "confirmed" ? (
+        <>
+          <p className="text-sm text-muted-foreground">
+            This appointment is confirmed. Complete it once the service is done.
+          </p>
+          <Button
+            onClick={() => completeMutation.mutate()}
+            disabled={completeMutation.isPending}
+          >
+            {completeMutation.isPending && (
+              <Loader2Icon className="size-4 animate-spin" />
+            )}
+            Complete Appointment
+          </Button>
+          {completeMutation.isError && (
+            <p className="text-xs text-destructive">
+              {extractError(completeMutation.error)}
+            </p>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="grid gap-1">
+            <p className="text-sm text-muted-foreground">
+              Confirm the booking for{" "}
+              <span className="font-medium text-foreground">
+                {appointment.service?.title}
+              </span>{" "}
+              on {formatDate(appointment.appointment_date)}.
+            </p>
+            {!assigned && (
+              <p className="text-xs text-destructive">
+                Assign a dentist before confirming.
+              </p>
+            )}
+          </div>
+          <Button
+            onClick={() => confirmMutation.mutate()}
+            disabled={confirmMutation.isPending || !assigned}
+          >
+            {confirmMutation.isPending && (
+              <Loader2Icon className="size-4 animate-spin" />
+            )}
+            Confirm Appointment
+          </Button>
+          {confirmMutation.isError && (
+            <p className="text-xs text-destructive">
+              {extractError(confirmMutation.error)}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  )
+
+  const managePanel = (
+    <>
+      {appointment.status !== "completed" && (
+        <>
+          <section className="grid gap-3">
+            <DateTimePicker
+              value={rescheduleDate}
+              onChange={setRescheduleDate}
+              minDate={rescheduleMin}
+            />
+            <Button
+              onClick={() => rescheduleMutation.mutate()}
+              disabled={rescheduleMutation.isPending || !rescheduleDate}
+            >
+              {rescheduleMutation.isPending && (
+                <Loader2Icon className="size-4 animate-spin" />
+              )}
+              Save Reschedule
+            </Button>
+            {rescheduleMutation.isError && (
+              <p className="text-xs text-destructive">
+                {extractError(rescheduleMutation.error)}
+              </p>
+            )}
+          </section>
+          <div className="h-px bg-border" />
+        </>
+      )}
+
+      <section className="grid gap-3">
+        <div className="grid gap-2">
+          <Label htmlFor="reason">Reason</Label>
+          <Input
+            id="reason"
+            placeholder="Required"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+          />
+        </div>
+        <Button
+          variant="destructive"
+          onClick={() => cancelMutation.mutate()}
+          disabled={cancelMutation.isPending || !cancellationReason.trim()}
+        >
+          {cancelMutation.isPending && (
+            <Loader2Icon className="size-4 animate-spin" />
+          )}
+          Cancel Appointment
+        </Button>
+        {cancelMutation.isError && (
+          <p className="text-xs text-destructive">
+            {extractError(cancelMutation.error)}
+          </p>
+        )}
+      </section>
+    </>
+  )
 
   if (isAdmin) {
     if (appointment.status === "cancelled") {
-      return (
-        <div className="mx-auto w-full max-w-xl">
-          <Card>
-            <CardContent className="grid gap-4 pt-6">
-              <div className="flex items-center justify-between gap-3">
-                <div className="grid gap-0.5">
-                  <h1 className="font-heading text-lg font-semibold">
-                    Appointment #{appointment.id}
-                  </h1>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(appointment.appointment_date)}
-                  </p>
-                </div>
-                <Badge variant={STATUS_COLORS[appointment.status]}>
-                  {appointment.status}
-                </Badge>
-              </div>
-
-              <div className="grid gap-3 border-t pt-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Service</span>
-                  <span>{appointment.service?.title ?? "-"}</span>
-                </div>
-                <div className="flex justify-between border-t pt-3">
-                  <span className="text-muted-foreground">Patient</span>
-                  <span>{appointment.patient?.name ?? "-"}</span>
-                </div>
-                <div className="flex justify-between border-t pt-3">
-                  <span className="text-muted-foreground">Dentist</span>
-                  <span>{appointment.dentist?.name ?? "Not assigned"}</span>
-                </div>
-                <div className="flex justify-between border-t pt-3">
-                  <span className="text-muted-foreground">Dental Concern</span>
-                  <span className="text-right">
-                    {appointment.dental_concern ?? "-"}
-                  </span>
-                </div>
-                {appointment.cancellation_reason && (
-                  <div className="grid gap-1 border-t border-destructive/30 bg-destructive/10 p-3 pt-3">
-                    <span className="text-xs font-medium text-destructive">
-                      Cancellation Reason
-                    </span>
-                    <p className="text-right">
-                      {appointment.cancellation_reason}
-                      {appointment.cancelled_by &&
-                        ` (${appointment.cancelled_by})`}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )
+      return <CancelledCard appointment={appointment} />
     }
 
     return (
@@ -301,54 +422,8 @@ export function AppointmentDetailPage() {
 
             {activeTab === 1 && (
               <div className="grid gap-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="grid gap-0.5">
-                    <h1 className="font-heading text-lg font-semibold">
-                      Appointment #{appointment.id}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(appointment.appointment_date)}
-                    </p>
-                  </div>
-                  <Badge variant={STATUS_COLORS[appointment.status]}>
-                    {appointment.status}
-                  </Badge>
-                </div>
-
-                <div className="grid gap-3 border-t pt-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Service</span>
-                    <span>{appointment.service?.title ?? "-"}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-3">
-                    <span className="text-muted-foreground">Patient</span>
-                    <span>{appointment.patient?.name ?? "-"}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-3">
-                    <span className="text-muted-foreground">Dentist</span>
-                    <span>{appointment.dentist?.name ?? "Not assigned"}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-3">
-                    <span className="text-muted-foreground">
-                      Dental Concern
-                    </span>
-                    <span className="text-right">
-                      {appointment.dental_concern ?? "-"}
-                    </span>
-                  </div>
-                  {appointment.cancellation_reason && (
-                    <div className="grid gap-1 border-t border-destructive/30 bg-destructive/10 p-3 pt-3">
-                      <span className="text-xs font-medium text-destructive">
-                        Cancellation Reason
-                      </span>
-                      <p className="text-right">
-                        {appointment.cancellation_reason}
-                        {appointment.cancelled_by &&
-                          ` (${appointment.cancelled_by})`}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <AppointmentHeader appointment={appointment} />
+                <AppointmentDetails appointment={appointment} />
               </div>
             )}
 
@@ -427,135 +502,11 @@ export function AppointmentDetailPage() {
               </div>
             )}
 
-            {activeTab === 3 && (
-              <div className="grid gap-3">
-                {appointment.status === "completed" ? (
-                  <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2Icon className="size-4 text-primary" />
-                    This appointment has been completed.
-                  </p>
-                ) : appointment.status === "confirmed" ? (
-                  <>
-                    <p className="text-sm text-muted-foreground">
-                      This appointment is confirmed. Complete it once the
-                      service is done.
-                    </p>
-                    <Button
-                      onClick={() => completeMutation.mutate()}
-                      disabled={completeMutation.isPending}
-                    >
-                      {completeMutation.isPending && (
-                        <Loader2Icon className="size-4 animate-spin" />
-                      )}
-                      Complete Appointment
-                    </Button>
-                    {completeMutation.isError && (
-                      <p className="text-xs text-destructive">
-                        {extractError(completeMutation.error)}
-                      </p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="grid gap-1">
-                      <p className="text-sm text-muted-foreground">
-                        Confirm the booking for{" "}
-                        <span className="font-medium text-foreground">
-                          {appointment.service?.title}
-                        </span>{" "}
-                        on {formatDate(appointment.appointment_date)}.
-                      </p>
-                      {!assigned && (
-                        <p className="text-xs text-destructive">
-                          Assign a dentist before confirming.
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      onClick={() => confirmMutation.mutate()}
-                      disabled={confirmMutation.isPending || !assigned}
-                    >
-                      {confirmMutation.isPending && (
-                        <Loader2Icon className="size-4 animate-spin" />
-                      )}
-                      Confirm Appointment
-                    </Button>
-                    {confirmMutation.isError && (
-                      <p className="text-xs text-destructive">
-                        {extractError(confirmMutation.error)}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+            {activeTab === 3 && confirmPanel}
 
             {activeTab === 4 && (
               <div className="grid gap-5 text-sm">
-                {appointment.status !== "completed" && (
-                  <>
-                    <section className="grid gap-3">
-                      <div className="grid gap-2">
-                        <Label htmlFor="reschedule_date">
-                          New Date &amp; Time
-                        </Label>
-                        <Input
-                          id="reschedule_date"
-                          type="datetime-local"
-                          min={minReschedule}
-                          value={rescheduleDate}
-                          onChange={(e) => setRescheduleDate(e.target.value)}
-                        />
-                      </div>
-                      <Button
-                        onClick={() => rescheduleMutation.mutate()}
-                        disabled={
-                          rescheduleMutation.isPending || !rescheduleDate
-                        }
-                      >
-                        {rescheduleMutation.isPending && (
-                          <Loader2Icon className="size-4 animate-spin" />
-                        )}
-                        Save Reschedule
-                      </Button>
-                      {rescheduleMutation.isError && (
-                        <p className="text-xs text-destructive">
-                          {extractError(rescheduleMutation.error)}
-                        </p>
-                      )}
-                    </section>
-                    <div className="h-px bg-border" />
-                  </>
-                )}
-
-                <section className="grid gap-3">
-                  <div className="grid gap-2">
-                    <Label htmlFor="reason">Reason</Label>
-                    <Input
-                      id="reason"
-                      placeholder="Required"
-                      value={cancellationReason}
-                      onChange={(e) => setCancellationReason(e.target.value)}
-                    />
-                  </div>
-                  <Button
-                    variant="destructive"
-                    onClick={() => cancelMutation.mutate()}
-                    disabled={
-                      cancelMutation.isPending || !cancellationReason.trim()
-                    }
-                  >
-                    {cancelMutation.isPending && (
-                      <Loader2Icon className="size-4 animate-spin" />
-                    )}
-                    Cancel Appointment
-                  </Button>
-                  {cancelMutation.isError && (
-                    <p className="text-xs text-destructive">
-                      {extractError(cancelMutation.error)}
-                    </p>
-                  )}
-                </section>
+                {managePanel}
 
                 <div className="h-px bg-border" />
                 <section className="flex items-center justify-between gap-3">
@@ -587,147 +538,58 @@ export function AppointmentDetailPage() {
     )
   }
 
-  return (
-    <div className="grid max-w-2xl gap-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-heading text-xl font-semibold">
-            Appointment #{appointment.id}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {formatDate(appointment.appointment_date)}
-          </p>
-        </div>
-        <Badge variant={STATUS_COLORS[appointment.status]}>
-          {appointment.status}
-        </Badge>
-      </div>
+  if (appointment.status === "cancelled") {
+    return <CancelledCard appointment={appointment} />
+  }
 
+  const tabs = isAssignedDentist
+    ? [
+        { id: 1, label: "Overview" },
+        { id: 2, label: "Confirm" },
+      ]
+    : [
+        { id: 1, label: "Overview" },
+        { id: 2, label: "Manage" },
+      ]
+  const safeTab = tabs.some((tab) => tab.id === activeTab)
+    ? activeTab
+    : (tabs[0].id as 1 | 2 | 3 | 4)
+
+  return (
+    <div className="mx-auto w-full max-w-xl">
       <Card>
-        <CardContent className="grid gap-3 pt-6 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Service</span>
-            <span>{appointment.service?.title ?? "-"}</span>
-          </div>
-          <div className="flex justify-between border-t pt-3">
-            <span className="text-muted-foreground">Patient</span>
-            <span>{appointment.patient?.name ?? "-"}</span>
-          </div>
-          <div className="flex justify-between border-t pt-3">
-            <span className="text-muted-foreground">Dentist</span>
-            <span>{appointment.dentist?.name ?? "Not assigned"}</span>
-          </div>
-          <div className="flex justify-between border-t pt-3">
-            <span className="text-muted-foreground">Dental Concern</span>
-            <span className="text-right">
-              {appointment.dental_concern ?? "-"}
-            </span>
-          </div>
-          {appointment.cancellation_reason && (
-            <div className="flex justify-between border-t pt-3">
-              <span className="text-muted-foreground">Cancellation Reason</span>
-              <span className="text-right">
-                {appointment.cancellation_reason} ({appointment.cancelled_by})
-              </span>
+        <CardContent className="grid gap-5">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-1 border bg-muted/50 p-1">
+              {tabs.map((tab) => (
+                <Button
+                  key={tab.id}
+                  variant={safeTab === tab.id ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab(tab.id as 1 | 2 | 3 | 4)}
+                  aria-pressed={safeTab === tab.id}
+                  className={safeTab === tab.id ? "" : "text-muted-foreground"}
+                >
+                  {tab.id} · {tab.label}
+                </Button>
+              ))}
             </div>
+          </div>
+
+          {safeTab === 1 && (
+            <div className="grid gap-4">
+              <AppointmentHeader appointment={appointment} />
+              <AppointmentDetails appointment={appointment} />
+            </div>
+          )}
+
+          {isAssignedDentist && safeTab === 2 && confirmPanel}
+
+          {!isAssignedDentist && safeTab === 2 && (
+            <div className="grid gap-5 text-sm">{managePanel}</div>
           )}
         </CardContent>
       </Card>
-
-      {canConfirm && appointment.status === "pending" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions</CardTitle>
-            <CardDescription>
-              Confirm this appointment to finalize it.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={() => confirmMutation.mutate()}
-              disabled={confirmMutation.isPending}
-            >
-              Confirm Appointment
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {canComplete && appointment.status === "confirmed" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Complete Service</CardTitle>
-            <CardDescription>
-              Mark this appointment as completed.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              onClick={() => completeMutation.mutate()}
-              disabled={completeMutation.isPending}
-            >
-              Complete Appointment
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {canEdit &&
-        appointment.status !== "completed" &&
-        appointment.status !== "cancelled" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Reschedule</CardTitle>
-              <CardDescription>
-                Change the appointment date and time.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              <div className="grid gap-2">
-                <Label htmlFor="reschedule_date">New Date &amp; Time</Label>
-                <Input
-                  id="reschedule_date"
-                  type="datetime-local"
-                  min={minReschedule}
-                  value={rescheduleDate}
-                  onChange={(e) => setRescheduleDate(e.target.value)}
-                />
-              </div>
-              <Button
-                onClick={() => rescheduleMutation.mutate()}
-                disabled={rescheduleMutation.isPending || !rescheduleDate}
-              >
-                Save Reschedule
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-      {canCancel && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Cancel Appointment</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="reason">Reason</Label>
-              <Input
-                id="reason"
-                placeholder="Required"
-                value={cancellationReason}
-                onChange={(e) => setCancellationReason(e.target.value)}
-              />
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => cancelMutation.mutate()}
-              disabled={cancelMutation.isPending || !cancellationReason.trim()}
-            >
-              Cancel Appointment
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
