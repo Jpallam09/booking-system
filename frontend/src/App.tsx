@@ -14,6 +14,7 @@ import { RegisterPage } from "@/pages/RegisterPage"
 import { ServiceDetailPage } from "@/pages/ServiceDetailPage"
 import { ServicesListPage } from "@/pages/ServicesListPage"
 import { RequireAuth } from "@/routes/RequireAuth"
+import { ServicesNewPage } from "@/pages/ServicesNewPage"
 
 const queryClient = new QueryClient()
 
@@ -48,6 +49,14 @@ function App() {
               <Route
                 path="/appointments/:id"
                 element={<AppointmentDetailPage />}
+              />
+              <Route
+                path="/services/new"
+                element={
+                  <RequireAuth roles={["admin"]}>
+                    <ServicesNewPage />
+                  </RequireAuth>
+                }
               />
               <Route
                 path="/services"
