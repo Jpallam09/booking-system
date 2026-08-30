@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { CheckCircle2Icon, Loader2Icon } from "lucide-react"
 
 import {
@@ -113,6 +113,14 @@ function AppointmentDetails({ appointment }: { appointment: Appointment }) {
 function CancelledCard({ appointment }: { appointment: Appointment }) {
   return (
     <div className="mx-auto w-full max-w-xl">
+      <Button
+        variant="ghost"
+        size="sm"
+        render={<Link to="/appointments" />}
+        className="mb-4"
+      >
+        Back
+      </Button>
       <Card>
         <CardContent className="grid gap-4 pt-6">
           <AppointmentHeader appointment={appointment} />
@@ -401,6 +409,14 @@ export function AppointmentDetailPage() {
 
     return (
       <div className="mx-auto w-full max-w-xl">
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link to="/appointments" />}
+          className="mb-4"
+        >
+          Back
+        </Button>
         <Card>
           <CardContent className="grid gap-5">
             <div className="flex justify-center">
@@ -562,6 +578,14 @@ export function AppointmentDetailPage() {
 
   return (
     <div className="mx-auto w-full max-w-xl">
+      <Button
+        variant="ghost"
+        size="sm"
+        render={<Link to="/appointments" />}
+        className="mb-4"
+      >
+        Back
+      </Button>
       <Card>
         <CardContent className="grid gap-5">
           <div className="flex justify-center">
