@@ -1,7 +1,9 @@
+import { useState } from "react"
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
 
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { cn } from "@/lib/utils"
 import type { UserRole } from "@/lib/types"
 
@@ -29,11 +31,15 @@ export function DashboardLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
+  const [logoutOpen, setLogoutOpen] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.roles || (user && item.roles.includes(user.role))
   )
 
   const handleLogout = async () => {
+    setLoggingOut(true)
     await logout()
     navigate("/")
   }
@@ -65,7 +71,11 @@ export function DashboardLayout() {
             <span className="text-xs text-muted-foreground">
               {user?.name} ({user?.role})
             </span>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLogoutOpen(true)}
+            >
               Logout
             </Button>
           </div>
@@ -74,6 +84,15 @@ export function DashboardLayout() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Outlet />
       </main>
+      <ConfirmDialog
+        open={logoutOpen}
+        onOpenChange={setLogoutOpen}
+        title="Log out?"
+        description="You will need to sign in again to manage appointments."
+        confirmLabel="Logout"
+        pending={loggingOut}
+        onConfirm={handleLogout}
+      />
     </div>
   )
 }
