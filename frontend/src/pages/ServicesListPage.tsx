@@ -1,16 +1,9 @@
 import { useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
+import { Link } from "react-router-dom"
 
-import { createService, listServices } from "@/api/services"
+import { listServices } from "@/api/services"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Pagination } from "@/components/shared/Pagination"
@@ -21,7 +14,6 @@ import type { ServicePayload } from "@/api/services"
 export function ServicesListPage() {
   const { user } = useAuth()
   const isAdmin = user?.role === "admin"
-  const queryClient = useQueryClient()
 
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState("")
@@ -29,16 +21,6 @@ export function ServicesListPage() {
   const [maxPrice, setMaxPrice] = useState("")
   const [appliedParams, setAppliedParams] = useState<Record<string, string>>({})
   const [page, setPage] = useState(1)
-
-  const [createOpen, setCreateOpen] = useState(false)
-  const [form, setForm] = useState<ServicePayload>({
-    title: "",
-    description: "",
-    price: "",
-    duration_minutes: 30,
-    status: "active",
-  })
-  const [createError, setCreateError] = useState<string | null>(null)
 
   const query = useQuery({
     queryKey: ["services", appliedParams, page],
@@ -50,32 +32,6 @@ export function ServicesListPage() {
         max_price: appliedParams.max_price || undefined,
         page,
       }),
-  })
-
-  const createMutation = useMutation({
-    mutationFn: () => createService(form),
-    onSuccess: () => {
-      setCreateOpen(false)
-      setForm({
-        title: "",
-        description: "",
-        price: "",
-        duration_minutes: 30,
-        status: "active",
-      })
-      queryClient.invalidateQueries({ queryKey: ["services"] })
-    },
-    onError: (err) => {
-      const response = (
-        err as { response?: { data?: { errors?: Record<string, string[]> } } }
-      )?.response?.data
-      const messages = response?.errors
-      setCreateError(
-        messages
-          ? Object.values(messages).flat().join(" ")
-          : "Failed to create service."
-      )
-    },
   })
 
   const applyFilters = () => {
@@ -101,85 +57,7 @@ export function ServicesListPage() {
           </p>
         </div>
         {isAdmin && (
-          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-            <DialogTrigger render={<Button>New Service</Button>} />
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create Service</DialogTitle>
-                <DialogDescription>
-                  Add a new dental service to the catalog.
-                </DialogDescription>
-              </DialogHeader>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  if (createError) setCreateError(null)
-                  createMutation.mutate()
-                }}
-                className="grid gap-4"
-              >
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={form.title}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, title: e.target.value }))
-                    }
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    value={form.description}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, description: e.target.value }))
-                    }
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="price">Price</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={form.price}
-                      onChange={(e) =>
-                        setForm((f) => ({ ...f, price: e.target.value }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="duration">Duration (mins)</Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      min="1"
-                      value={form.duration_minutes}
-                      onChange={(e) =>
-                        setForm((f) => ({
-                          ...f,
-                          duration_minutes: Number(e.target.value),
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-                {createError && (
-                  <p className="text-xs text-destructive">{createError}</p>
-                )}
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Saving..." : "Create Service"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <Button render={<Link to="/services/new" />}>New Service</Button>
         )}
       </div>
 
