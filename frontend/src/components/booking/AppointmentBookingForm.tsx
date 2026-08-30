@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 
 import { createAppointment } from "@/api/appointments"
 import { listServices } from "@/api/services"
+import { DateTimePicker } from "@/components/booking/DateTimePicker"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,22 +13,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { clearBookingDraft, getBookingDraft } from "@/lib/auth"
 import { formatCurrency } from "@/lib/format"
 import type { Service } from "@/lib/types"
-
-function toDateTimeLocal(date: Date): string {
-  const offsetMs = date.getTimezoneOffset() * 60000
-  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
-}
 
 export function AppointmentBookingForm() {
   const navigate = useNavigate()
@@ -39,6 +34,10 @@ export function AppointmentBookingForm() {
   const [serviceId, setServiceId] = useState("")
   const [appointmentDate, setAppointmentDate] = useState("")
   const [dentalConcern, setDentalConcern] = useState("")
+
+  const selectedService = services.find(
+    (service) => String(service.id) === serviceId
+  )
 
   useEffect(() => {
     listServices()
@@ -83,11 +82,6 @@ export function AppointmentBookingForm() {
     }
   }
 
-  const initialDate =
-    appointmentDate ||
-    toDateTimeLocal(new Date(Date.now() + 24 * 60 * 60 * 1000))
-  const minDate = toDateTimeLocal(new Date(Date.now() + 60 * 60 * 1000))
-
   return (
     <form onSubmit={handleSubmit}>
       <Card>
@@ -95,14 +89,23 @@ export function AppointmentBookingForm() {
           <CardTitle>Book an Appointment</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="service">Service</Label>
+          <Field>
+            <FieldLabel htmlFor="service">Service</FieldLabel>
             <Select
               onValueChange={(value) => setServiceId(value ?? "")}
               value={serviceId || undefined}
             >
               <SelectTrigger id="service" className="w-full">
-                <SelectValue placeholder="Select a service" />
+                {selectedService ? (
+                  <span className="text-foreground">
+                    {selectedService.title} -{" "}
+                    {formatCurrency(selectedService.price)}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    Select a service
+                  </span>
+                )}
               </SelectTrigger>
               <SelectContent>
                 {services.map((service) => (
@@ -112,29 +115,31 @@ export function AppointmentBookingForm() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+            <FieldDescription>
+              {selectedService
+                ? `You selected: ${selectedService.title} - ${formatCurrency(
+                    selectedService.price
+                  )}`
+                : "Choose the dental service you need."}
+            </FieldDescription>
+          </Field>
 
-          <div className="grid gap-2">
-            <Label htmlFor="appointment_date">Date &amp; Time</Label>
-            <Input
-              id="appointment_date"
-              type="datetime-local"
-              min={minDate}
-              value={initialDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
-              required
-            />
-          </div>
+          <DateTimePicker
+            value={appointmentDate}
+            onChange={setAppointmentDate}
+          />
 
-          <div className="grid gap-2">
-            <Label htmlFor="dental_concern">Dental Concern (optional)</Label>
+          <Field>
+            <FieldLabel htmlFor="dental_concern">
+              Dental Concern (optional)
+            </FieldLabel>
             <Input
               id="dental_concern"
               placeholder="e.g. Toothache, cleaning, checkup"
               value={dentalConcern}
               onChange={(e) => setDentalConcern(e.target.value)}
             />
-          </div>
+          </Field>
 
           {error && (
             <p className="text-xs text-destructive" role="alert">
