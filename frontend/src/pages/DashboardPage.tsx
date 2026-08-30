@@ -2,7 +2,6 @@ import { Link } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
 
 import { listAppointments } from "@/api/appointments"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,19 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { StatusBadge } from "@/components/shared/StatusBadge"
 import { useAuth } from "@/context/AuthContext"
 import { formatDate } from "@/lib/format"
-import type { AppointmentStatus } from "@/lib/types"
-
-const STATUS_COLORS: Record<
-  AppointmentStatus,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  pending: "secondary",
-  confirmed: "default",
-  completed: "outline",
-  cancelled: "destructive",
-}
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -120,9 +109,7 @@ export function DashboardPage() {
                   {formatDate(appointment.appointment_date)}
                 </p>
               </div>
-              <Badge variant={STATUS_COLORS[appointment.status]}>
-                {appointment.status}
-              </Badge>
+              <StatusBadge status={appointment.status} />
             </div>
           ))}
         </CardContent>

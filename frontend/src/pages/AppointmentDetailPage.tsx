@@ -14,7 +14,6 @@ import {
 } from "@/api/appointments"
 import { listUsers } from "@/api/users"
 import { DateTimePicker } from "@/components/booking/DateTimePicker"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
@@ -27,20 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { StatusBadge } from "@/components/shared/StatusBadge"
 import { toast } from "@/components/ui/toast"
 import { useAuth } from "@/context/AuthContext"
 import { formatDate } from "@/lib/format"
-import type { Appointment, AppointmentStatus } from "@/lib/types"
-
-const STATUS_COLORS: Record<
-  AppointmentStatus,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  pending: "secondary",
-  confirmed: "default",
-  completed: "outline",
-  cancelled: "destructive",
-}
+import type { Appointment } from "@/lib/types"
 
 const TABS = [
   { id: 1, label: "Overview" },
@@ -81,9 +71,7 @@ function AppointmentHeader({ appointment }: { appointment: Appointment }) {
           {formatDate(appointment.appointment_date)}
         </p>
       </div>
-      <Badge variant={STATUS_COLORS[appointment.status]}>
-        {appointment.status}
-      </Badge>
+      <StatusBadge status={appointment.status} />
     </div>
   )
 }

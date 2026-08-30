@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query"
 
 import { listAppointments } from "@/api/appointments"
 import { listServices } from "@/api/services"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Pagination } from "@/components/shared/Pagination"
+import { StatusBadge } from "@/components/shared/StatusBadge"
 import { useAuth } from "@/context/AuthContext"
 import { formatDate } from "@/lib/format"
 import type { AppointmentStatus } from "@/lib/types"
@@ -35,16 +35,6 @@ const STATUS_OPTIONS: Array<AppointmentStatus | ""> = [
   "completed",
   "cancelled",
 ]
-
-const STATUS_COLORS: Record<
-  AppointmentStatus,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  pending: "secondary",
-  confirmed: "default",
-  completed: "outline",
-  cancelled: "destructive",
-}
 
 export function AppointmentsListPage() {
   const { user } = useAuth()
@@ -249,9 +239,7 @@ export function AppointmentsListPage() {
                   {formatDate(appointment.appointment_date)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={STATUS_COLORS[appointment.status]}>
-                    {appointment.status}
-                  </Badge>
+                  <StatusBadge status={appointment.status} />
                 </TableCell>
               </TableRow>
             ))}
