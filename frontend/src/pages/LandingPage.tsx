@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ServiceCard } from "@/components/services/ServiceCard"
+import { GridBackground } from "@/components/shared/GridBackground"
 import { useAuth } from "@/context/AuthContext"
 import type { Service } from "@/lib/types"
 
@@ -126,7 +127,7 @@ export function LandingPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-cyan-50 via-background to-background">
+    <div className="flex min-h-screen w-full flex-col bg-white">
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2.5">
@@ -162,14 +163,7 @@ export function LandingPage() {
 
       <main className="flex-1">
         <section className="relative overflow-hidden">
-          <div
-            aria-hidden="true"
-            className="absolute -top-24 -right-24 size-96 bg-cyan-200/40 blur-3xl"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-32 -left-24 size-96 bg-teal-100/60 blur-3xl"
-          />
+          <GridBackground />
 
           <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:grid-cols-2 md:py-24">
             <div>
@@ -227,10 +221,6 @@ export function LandingPage() {
             </div>
 
             <div className="relative">
-              <div
-                aria-hidden="true"
-                className="absolute -inset-4 bg-gradient-to-tr from-teal-200 to-cyan-100 blur-2xl"
-              />
               <div className="relative overflow-hidden border bg-card shadow-xl shadow-cyan-900/10">
                 <img
                   src={heroImage}
@@ -331,8 +321,9 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="border-y bg-gradient-to-b from-cyan-50 to-background">
-          <div className="mx-auto max-w-6xl px-4 py-16">
+        <section className="relative border-y">
+          <GridBackground />
+          <div className="relative mx-auto max-w-6xl px-4 py-16">
             <div className="max-w-2xl">
               <h2 className="font-display text-2xl font-bold tracking-tight text-balance sm:text-3xl">
                 Loved by patients, for years
