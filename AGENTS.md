@@ -1,4 +1,4 @@
-# Booking System - Agent Instructions
+# Lumina Dental - Agent Instructions
 
 ## Architecture
 

@@ -49,7 +49,7 @@ export function DashboardLayout() {
       <header className="border-b">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <Link to="/" className="font-heading text-sm font-semibold">
-            Booking System
+            Lumina Dental
           </Link>
           <nav className="flex items-center gap-1">
             {visibleItems.map((item) => (

@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-The Booking System (dental clinic) consists of:
+The Lumina Dental (dental clinic) app consists of:
 
 * **Backend** — Laravel 13 REST API (`http://localhost:8000/api`) with MySQL.
   Role-based access control (Sanctum) across three roles: `admin`, `dentist`, `patient`.

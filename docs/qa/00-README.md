@@ -1,6 +1,6 @@
-# QA Documentation — Booking System
+# QA Documentation — Lumina Dental
 
-This folder contains the Quality Assurance documentation for the Booking System
+This folder contains the Quality Assurance documentation for the Lumina Dental
 (dental-clinic appointment booking: React + TypeScript frontend, Laravel REST API
 backend, MySQL database).
 

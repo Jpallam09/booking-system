@@ -135,7 +135,7 @@ export function LandingPage() {
               <CalendarHeart className="size-5" />
             </span>
             <span className="font-display text-sm font-bold tracking-tight">
-              Booking System
+              Lumina Dental
             </span>
           </Link>
           <nav className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export function LandingPage() {
               <CalendarHeart className="size-4" />
             </span>
             <span className="font-display text-sm font-bold">
-              Booking System
+              Lumina Dental
             </span>
           </div>
           <nav className="flex items-center gap-5 text-sm opacity-80">
@@ -399,7 +399,7 @@ export function LandingPage() {
             <Link to="/register">Register</Link>
           </nav>
           <p className="text-xs opacity-60">
-            © {new Date().getFullYear()} Booking System. All rights reserved.
+            © {new Date().getFullYear()} Lumina Dental. All rights reserved.
           </p>
         </div>
       </footer>
