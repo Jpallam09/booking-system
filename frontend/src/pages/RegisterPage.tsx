@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 import { register } from "@/api/auth"
 import { setAuth } from "@/lib/auth"
+import { AuthGridBackground } from "@/components/shared/AuthGridBackground"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -67,8 +68,9 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div className="grid w-full max-w-sm gap-2">
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-white px-4">
+      <AuthGridBackground />
+      <div className="relative grid w-full max-w-sm gap-2">
         <Button
           variant="ghost"
           size="sm"
