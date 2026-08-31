@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { CalendarHeart, Star } from "lucide-react"
 
 import formImage from "@/assets/form.jpg"
 import { cn } from "@/lib/utils"
@@ -11,16 +12,40 @@ export function AuthLayout({
   imageSide?: "left" | "right"
 }) {
   const image = (
-    <section
-      aria-hidden="true"
-      className="relative hidden overflow-hidden bg-primary lg:block"
-    >
+    <section className="relative hidden overflow-hidden bg-primary lg:block">
       <img
         src={formImage}
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20"
+      />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-4 p-10">
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-9 items-center justify-center bg-gradient-to-tr from-teal-500 to-cyan-500 text-white">
+            <CalendarHeart className="size-5" />
+          </span>
+          <span className="font-display text-sm font-bold tracking-tight text-white">
+            Lumina Dental
+          </span>
+        </div>
+        <div className="flex flex-col gap-3">
+          <h2 className="max-w-md font-display text-2xl leading-tight font-bold tracking-tight text-balance text-white lg:text-3xl">
+            Modern dental care, booked in seconds.
+          </h2>
+          <p className="max-w-sm text-sm leading-relaxed text-white/80">
+            Browse services, choose a time, and manage your visits — all
+            online.
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5 text-sm text-white/80">
+          <Star className="size-4 fill-teal-300 text-teal-300" />
+          <span className="font-medium text-white">4.9</span>
+          <span className="text-white/70">Average patient rating</span>
+        </div>
+      </div>
     </section>
   )
 
