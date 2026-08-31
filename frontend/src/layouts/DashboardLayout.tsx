@@ -8,6 +8,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -145,12 +146,14 @@ export function DashboardLayout() {
                 }
               />
               <DropdownMenuContent className="w-52" align="end">
-                <DropdownMenuLabel>
-                  {user?.name}
-                  <div className="text-xs font-normal capitalize text-muted-foreground">
-                    {user?.role}
-                  </div>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>
+                    {user?.name}
+                    <div className="text-xs font-normal capitalize text-muted-foreground">
+                      {user?.role}
+                    </div>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
