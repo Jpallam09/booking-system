@@ -30,13 +30,16 @@ function isTheme(value: string | null): value is Theme {
   return THEME_VALUES.includes(value as Theme)
 }
 
-function getSystemTheme(): ResolvedTheme {
-  if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
-    return "dark"
-  }
+// TEMPORARY: dark mode is disabled (light-only). Restore this helper to
+// re-enable dark mode — it is referenced by the keyboard toggle and the
+// resolved-theme line inside `applyTheme`.
+// function getSystemTheme(): ResolvedTheme {
+//   if (window.matchMedia(COLOR_SCHEME_QUERY).matches) {
+//     return "dark"
+//   }
 
-  return "light"
-}
+//   return "light"
+// }
 
 function disableTransitionsTemporarily() {
   const style = document.createElement("style")
@@ -57,24 +60,27 @@ function disableTransitionsTemporarily() {
   }
 }
 
-function isEditableTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) {
-    return false
-  }
+// TEMPORARY: dark mode is disabled (light-only). The keyboard shortcut
+// below is commented out along with its helper. To re-enable dark mode,
+// restore this function and the `keydown` effect further below.
+// function isEditableTarget(target: EventTarget | null) {
+//   if (!(target instanceof HTMLElement)) {
+//     return false
+//   }
 
-  if (target.isContentEditable) {
-    return true
-  }
+//   if (target.isContentEditable) {
+//     return true
+//   }
 
-  const editableParent = target.closest(
-    "input, textarea, select, [contenteditable='true']"
-  )
-  if (editableParent) {
-    return true
-  }
+//   const editableParent = target.closest(
+//     "input, textarea, select, [contenteditable='true']"
+//   )
+//   if (editableParent) {
+//     return true
+//   }
 
-  return false
-}
+//   return false
+// }
 
 export function ThemeProvider({
   children,
@@ -102,9 +108,16 @@ export function ThemeProvider({
 
   const applyTheme = React.useCallback(
     (nextTheme: Theme) => {
+      // TEMPORARY: `nextTheme` is intentionally ignored while the app is
+      // locked to light mode. Delete this line and restore the resolution
+      // below to re-enable dark mode.
+      void nextTheme
       const root = document.documentElement
-      const resolvedTheme =
-        nextTheme === "system" ? getSystemTheme() : nextTheme
+      // TEMPORARY: dark mode is disabled (light-only). To re-enable,
+      // uncomment the line below and remove the hardcoded "light".
+      const resolvedTheme: ResolvedTheme = "light"
+      // const resolvedTheme =
+      //   nextTheme === "system" ? getSystemTheme() : nextTheme
       const restoreTransitions = disableTransitionOnChange
         ? disableTransitionsTemporarily()
         : null
@@ -138,45 +151,48 @@ export function ThemeProvider({
     }
   }, [theme, applyTheme])
 
-  React.useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return
-      }
+  // TEMPORARY: dark mode is disabled (light-only). Restore this effect
+  // (and the `isEditableTarget` helper above) to re-enable the keyboard
+  // dark-mode toggle.
+  // React.useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     if (event.repeat) {
+  //       return
+  //     }
 
-      if (event.metaKey || event.ctrlKey || event.altKey) {
-        return
-      }
+  //     if (event.metaKey || event.ctrlKey || event.altKey) {
+  //       return
+  //     }
 
-      if (isEditableTarget(event.target)) {
-        return
-      }
+  //     if (isEditableTarget(event.target)) {
+  //       return
+  //     }
 
-      if (event.key.toLowerCase() !== "d") {
-        return
-      }
+  //     if (event.key.toLowerCase() !== "d") {
+  //       return
+  //     }
 
-      setThemeState((currentTheme) => {
-        const nextTheme =
-          currentTheme === "dark"
-            ? "light"
-            : currentTheme === "light"
-              ? "dark"
-              : getSystemTheme() === "dark"
-                ? "light"
-                : "dark"
+  //     setThemeState((currentTheme) => {
+  //       const nextTheme =
+  //         currentTheme === "dark"
+  //           ? "light"
+  //           : currentTheme === "light"
+  //             ? "dark"
+  //             : getSystemTheme() === "dark"
+  //               ? "light"
+  //               : "dark"
 
-        localStorage.setItem(storageKey, nextTheme)
-        return nextTheme
-      })
-    }
+  //       localStorage.setItem(storageKey, nextTheme)
+  //       return nextTheme
+  //     })
+  //   }
 
-    window.addEventListener("keydown", handleKeyDown)
+  //   window.addEventListener("keydown", handleKeyDown)
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [storageKey])
+  //   return () => {
+  //     window.removeEventListener("keydown", handleKeyDown)
+  //   }
+  // }, [storageKey])
 
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
