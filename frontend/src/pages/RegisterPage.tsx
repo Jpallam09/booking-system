@@ -68,9 +68,9 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-white px-4">
+    <div className="relative flex min-h-dvh w-full flex-col items-center bg-white px-4 py-6">
       <AuthGridBackground />
-      <div className="relative grid w-full max-w-sm gap-2">
+      <div className="relative my-auto grid w-full max-w-sm gap-2">
         <Button
           variant="ghost"
           size="sm"
