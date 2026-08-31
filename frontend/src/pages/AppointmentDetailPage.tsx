@@ -482,7 +482,12 @@ export function AppointmentDetailPage() {
                         onValueChange={(v) => setDentistId(String(v ?? ""))}
                       >
                         <SelectTrigger id="dentist" className="w-full">
-                          <SelectValue placeholder="Select a dentist" />
+                          <SelectValue placeholder="Select a dentist">
+                            {
+                              dentists.find((d) => String(d.id) === dentistId)
+                                ?.name
+                            }
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {dentists.map((dentist) => (
