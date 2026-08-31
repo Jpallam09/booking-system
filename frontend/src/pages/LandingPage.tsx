@@ -129,16 +129,16 @@ export function LandingPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-3 sm:px-4">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center bg-gradient-to-tr from-teal-500 to-cyan-500 text-white">
               <CalendarHeart className="size-5" />
             </span>
-            <span className="font-display text-sm font-bold tracking-tight">
+            <span className="hidden font-display text-sm font-bold tracking-tight sm:block">
               Lumina Dental
             </span>
           </Link>
-          <nav className="flex items-center gap-2">
+          <nav className="flex items-center gap-1.5 sm:gap-2">
             {isAuthenticated ? (
               <Button
                 variant="outline"
