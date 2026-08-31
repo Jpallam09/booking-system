@@ -26,9 +26,9 @@ class DatabaseSeeder extends Seeder
 
         // 2. Create Dentist Accounts
         $dentists = [
-            ['name' => 'Dentist 1', 'phone' => '09123456780'],
-            ['name' => 'Dentist 2', 'phone' => '09123456781'],
-            ['name' => 'Dentist 3', 'phone' => '09123456782'],
+            ['name' => 'Dr. Ramon Dela Cruz', 'phone' => '09123456780'],
+            ['name' => 'Dr. Maria Santos', 'phone' => '09123456781'],
+            ['name' => 'Dr. Liza Reyes', 'phone' => '09123456782'],
         ];
 
         foreach ($dentists as $i => $dentist) {
@@ -54,7 +54,21 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 4. Seed curated dental services
+        // 4. Create Second Patient Account
+        User::updateOrCreate(
+            ['email' => 'patient2@example.com'],
+            [
+                'name' => 'Juan Tamad',
+                'password' => Hash::make('password123'),
+                'role' => 'patient',
+                'phone' => '09171234567',
+            ]
+        );
+
+        // 5. Seed curated dental services
         $this->call(ServiceSeeder::class);
+
+        // 6. Seed appointments for the second patient
+        $this->call(AppointmentSeeder::class);
     }
 }
