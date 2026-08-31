@@ -90,22 +90,21 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <div className="grid gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false} render={<Link to="/" />}
-          className="justify-self-start"
-        >
-          Back
-        </Button>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              Access your appointments and services.
-            </CardDescription>
-          </CardHeader>
+      <Card className="w-full">
+        <CardHeader className="gap-3">
+          <Button
+            variant="link"
+            size="sm"
+            nativeButton={false} render={<Link to="/" />}
+            className="-mx-2 place-self-start px-2.5"
+          >
+            Back
+          </Button>
+          <CardTitle>Sign In</CardTitle>
+          <CardDescription>
+            Access your appointments and services.
+          </CardDescription>
+        </CardHeader>
           <form onSubmit={handleSubmit} noValidate>
             <CardContent className="grid gap-4">
               <Field>
@@ -188,7 +187,6 @@ export function LoginPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
     </AuthLayout>
   )
 }

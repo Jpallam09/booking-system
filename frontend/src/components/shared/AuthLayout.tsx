@@ -25,9 +25,9 @@ export function AuthLayout({
   )
 
   return (
-    <div className="grid min-h-dvh w-full bg-white lg:grid-cols-2">
+    <div className="grid h-dvh w-full overflow-hidden bg-white lg:grid-cols-2">
       {imageSide === "left" && image}
-      <main className="relative flex min-h-dvh items-center justify-center px-4 py-6">
+      <main className="relative flex h-full min-h-0 flex-col">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -38,7 +38,13 @@ export function AuthLayout({
             `,
           }}
         />
-        <div className={cn("relative w-full max-w-sm")}>{children}</div>
+        <div className="relative flex w-full max-w-sm flex-1 flex-col self-center px-4 py-4 sm:py-6">
+          <div className="relative -mx-4 flex-1 min-h-0 overflow-y-auto px-4 pb-2">
+            <div className={cn("flex min-h-full flex-col justify-center")}>
+              {children}
+            </div>
+          </div>
+        </div>
       </main>
       {imageSide === "right" && image}
     </div>

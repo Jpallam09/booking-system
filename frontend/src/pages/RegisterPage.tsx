@@ -129,20 +129,19 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <div className="grid gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false} render={<Link to="/" />}
-          className="justify-self-start"
-        >
-          Back
-        </Button>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Create Account</CardTitle>
-            <CardDescription>Register as a patient.</CardDescription>
-          </CardHeader>
+      <Card className="w-full">
+        <CardHeader className="gap-3">
+          <Button
+            variant="link"
+            size="sm"
+            nativeButton={false} render={<Link to="/" />}
+            className="-mx-2 place-self-start px-2.5"
+          >
+            Back
+          </Button>
+          <CardTitle>Create Account</CardTitle>
+          <CardDescription>Register as a patient.</CardDescription>
+        </CardHeader>
           <form onSubmit={handleSubmit} noValidate>
             <CardContent className="grid gap-4">
               <Field>
@@ -300,7 +299,6 @@ export function RegisterPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
     </AuthLayout>
   )
 }
