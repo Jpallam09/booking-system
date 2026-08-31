@@ -45,7 +45,7 @@ export function ServiceCard({ service, showAction = true }: ServiceCardProps) {
           <Button
             variant="outline"
             className="w-full"
-            render={<Link to={`/services/${service.id}`} />}
+            nativeButton={false} render={<Link to={`/services/${service.id}`} />}
           >
             View Details
           </Button>

@@ -149,10 +149,10 @@ export function LandingPage() {
               </Button>
             ) : (
               <>
-                <Button variant="ghost" size="sm" render={<Link to="/login" />}>
+                <Button variant="ghost" size="sm" nativeButton={false} render={<Link to="/login" />}>
                   Sign In
                 </Button>
-                <Button size="sm" render={<Link to="/register" />}>
+                <Button size="sm" nativeButton={false} render={<Link to="/register" />}>
                   Register
                 </Button>
               </>
@@ -185,7 +185,7 @@ export function LandingPage() {
                   variant="outline"
                   size="lg"
                   className="px-5"
-                  render={<a href="#services" />}
+                  nativeButton={false} render={<a href="#services" />}
                 >
                   Browse services
                 </Button>
@@ -309,7 +309,7 @@ export function LandingPage() {
                 From routine check-ups to specialist treatments.
               </p>
             </div>
-            <Button variant="ghost" render={<a href="#" />}>
+            <Button variant="ghost" nativeButton={false} render={<a href="#" />}>
               View all services
               <ArrowRight className="size-4" />
             </Button>

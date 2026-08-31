@@ -263,7 +263,7 @@ export function ServiceDetailPage() {
   return (
     <div className="mx-auto w-full max-w-xl">
       <div className="mb-4 flex items-center justify-between">
-        <Button variant="ghost" size="sm" render={<Link to="/services" />}>
+        <Button variant="ghost" size="sm" nativeButton={false} render={<Link to="/services" />}>
           Back
         </Button>
         <Badge variant={service.status === "active" ? "default" : "secondary"}>

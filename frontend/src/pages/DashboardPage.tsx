@@ -84,7 +84,7 @@ export function DashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            render={<Link to="/appointments" />}
+            nativeButton={false} render={<Link to="/appointments" />}
           >
             View All
           </Button>

@@ -57,7 +57,7 @@ export function ServicesListPage() {
           </p>
         </div>
         {isAdmin && (
-          <Button render={<Link to="/services/new" />}>New Service</Button>
+          <Button nativeButton={false} render={<Link to="/services/new" />}>New Service</Button>
         )}
       </div>
 

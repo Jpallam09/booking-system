@@ -104,7 +104,7 @@ export function AppointmentsListPage() {
           </p>
         </div>
         {user?.role === "patient" && (
-          <Button render={<Link to="/appointments/new" />}>
+          <Button nativeButton={false} render={<Link to="/appointments/new" />}>
             Book Appointment
           </Button>
         )}

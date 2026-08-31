@@ -116,7 +116,7 @@ function CancelledCard({ appointment }: { appointment: Appointment }) {
       <Button
         variant="ghost"
         size="sm"
-        render={<Link to="/appointments" />}
+        nativeButton={false} render={<Link to="/appointments" />}
         className="mb-4"
       >
         Back
@@ -414,7 +414,7 @@ export function AppointmentDetailPage() {
         <Button
           variant="ghost"
           size="sm"
-          render={<Link to="/appointments" />}
+          nativeButton={false} render={<Link to="/appointments" />}
           className="mb-4"
         >
           Back
@@ -588,7 +588,7 @@ export function AppointmentDetailPage() {
       <Button
         variant="ghost"
         size="sm"
-        render={<Link to="/appointments" />}
+        nativeButton={false} render={<Link to="/appointments" />}
         className="mb-4"
       >
         Back

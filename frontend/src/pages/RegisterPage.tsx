@@ -74,7 +74,7 @@ export function RegisterPage() {
         <Button
           variant="ghost"
           size="sm"
-          render={<Link to="/" />}
+          nativeButton={false} render={<Link to="/" />}
           className="justify-self-start"
         >
           Back
