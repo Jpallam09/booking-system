@@ -2,7 +2,6 @@ import type { ReactNode } from "react"
 import { CalendarHeart, Star } from "lucide-react"
 
 import formImage from "@/assets/form.jpg"
-import { cn } from "@/lib/utils"
 
 export function AuthLayout({
   children,
@@ -52,23 +51,17 @@ export function AuthLayout({
   return (
     <div className="grid h-dvh w-full overflow-hidden bg-white lg:grid-cols-2">
       {imageSide === "left" && image}
-      <main className="relative flex h-full min-h-0 flex-col">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle 500px at 50% 100%, rgba(139,92,246,0.3), transparent),
-              radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.3), transparent)
-            `,
-          }}
-        />
-        <div className="relative flex w-full max-w-sm flex-1 flex-col self-center px-4 py-4 sm:py-6">
-          <div className="relative -mx-4 flex-1 min-h-0 overflow-y-auto px-4 pb-2">
-            <div className={cn("flex min-h-full flex-col justify-center")}>
-              {children}
-            </div>
-          </div>
+      <main
+        className="relative h-full overflow-y-auto"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle 500px at 50% 100%, rgba(139,92,246,0.3), transparent),
+            radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.3), transparent)
+          `,
+        }}
+      >
+        <div className="mx-auto flex min-h-full w-full max-w-sm flex-col px-4 py-10">
+          <div className="my-auto flex w-full flex-col">{children}</div>
         </div>
       </main>
       {imageSide === "right" && image}

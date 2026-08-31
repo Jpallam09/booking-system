@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
-import { Eye, EyeOff } from "lucide-react"
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react"
 
 import { useAuth } from "@/context/AuthContext"
 import { AuthLayout } from "@/components/shared/AuthLayout"
@@ -38,6 +38,13 @@ export function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const summaryRef = useRef<HTMLDivElement>(null)
+
+  const summaryMessage = (() => {
+    const messages = Object.values(fieldErrors).filter(Boolean)
+    if (messages.length > 0) return messages.join(" ")
+    return error
+  })()
 
   const validateField = (field: keyof FieldErrors, value: string) => {
     const next: FieldErrors = { ...fieldErrors }
@@ -66,6 +73,7 @@ export function LoginPage() {
     if (!password) next.password = "Enter your password."
     if (Object.keys(next).length > 0) {
       setFieldErrors(next)
+      requestAnimationFrame(() => summaryRef.current?.focus())
       return
     }
     setLoading(true)
@@ -83,6 +91,7 @@ export function LoginPage() {
           ? Object.values(messages).flat().join(" ")
           : "Login failed. Check your credentials."
       )
+      requestAnimationFrame(() => summaryRef.current?.focus())
     } finally {
       setLoading(false)
     }
@@ -107,6 +116,17 @@ export function LoginPage() {
         </CardHeader>
           <form onSubmit={handleSubmit} noValidate>
             <CardContent className="grid gap-4">
+              {summaryMessage && (
+                <div
+                  ref={summaryRef}
+                  tabIndex={-1}
+                  role="alert"
+                  className="flex items-start gap-2 rounded-none border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive outline-none"
+                >
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <span>{summaryMessage}</span>
+                </div>
+              )}
               <Field>
                 <FieldContent>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -122,6 +142,7 @@ export function LoginPage() {
                     aria-describedby={
                       fieldErrors.email ? "email-error" : undefined
                     }
+                    className="md:h-9 md:px-3 md:text-sm"
                     required
                   />
                   {fieldErrors.email && (
@@ -144,7 +165,7 @@ export function LoginPage() {
                       aria-describedby={
                         fieldErrors.password ? "password-error" : undefined
                       }
-                      className="pr-10"
+                      className="pr-10 md:h-9 md:px-3 md:text-sm"
                       required
                     />
                     <Button
@@ -165,14 +186,10 @@ export function LoginPage() {
                   )}
                 </FieldContent>
               </Field>
-              {error && (
-                <p className="text-xs text-destructive" role="alert">
-                  {error}
-                </p>
-              )}
             </CardContent>
             <CardFooter className="flex-col gap-3">
               <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
               <p className="text-xs text-muted-foreground">

@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
-import { Eye, EyeOff } from "lucide-react"
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react"
 
 import { register } from "@/api/auth"
 import { setAuth } from "@/lib/auth"
@@ -17,6 +17,7 @@ import {
 import {
   Field,
   FieldContent,
+  FieldDescription,
   FieldError,
   FieldLabel,
 } from "@/components/ui/field"
@@ -47,6 +48,13 @@ export function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const summaryRef = useRef<HTMLDivElement>(null)
+
+  const summaryMessage = (() => {
+    const messages = Object.values(fieldErrors).filter(Boolean)
+    if (messages.length > 0) return messages.join(" ")
+    return error
+  })()
 
   const update =
     (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -99,6 +107,7 @@ export function RegisterPage() {
     if (form.password.length < 8) next.password = "Password must be at least 8 characters."
     if (Object.keys(next).length > 0) {
       setFieldErrors(next)
+      requestAnimationFrame(() => summaryRef.current?.focus())
       return
     }
     setLoading(true)
@@ -122,6 +131,7 @@ export function RegisterPage() {
           ? Object.values(messages).flat().join(" ")
           : "Registration failed."
       )
+      requestAnimationFrame(() => summaryRef.current?.focus())
     } finally {
       setLoading(false)
     }
@@ -129,8 +139,8 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <Card className="w-full">
-        <CardHeader className="gap-3">
+      <Card size="sm" className="w-full">
+        <CardHeader className="gap-2">
           <Button
             variant="link"
             size="sm"
@@ -143,10 +153,26 @@ export function RegisterPage() {
           <CardDescription>Register as a patient.</CardDescription>
         </CardHeader>
           <form onSubmit={handleSubmit} noValidate>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-3">
+              {summaryMessage && (
+                <div
+                  ref={summaryRef}
+                  tabIndex={-1}
+                  role="alert"
+                  className="flex items-start gap-2 rounded-none border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive outline-none"
+                >
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <span>{summaryMessage}</span>
+                </div>
+              )}
               <Field>
                 <FieldContent>
-                  <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                  <FieldLabel htmlFor="name">
+                    Full Name
+                    <span className="font-normal text-muted-foreground">
+                      (required)
+                    </span>
+                  </FieldLabel>
                   <Input
                     id="name"
                     autoComplete="name"
@@ -155,6 +181,7 @@ export function RegisterPage() {
                     onBlur={handleBlur("name")}
                     aria-invalid={!!fieldErrors.name || undefined}
                     aria-describedby={fieldErrors.name ? "name-error" : undefined}
+                    className="md:h-9 md:px-3 md:text-sm"
                     required
                   />
                   {fieldErrors.name && (
@@ -164,7 +191,12 @@ export function RegisterPage() {
               </Field>
               <Field>
                 <FieldContent>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <FieldLabel htmlFor="email">
+                    Email
+                    <span className="font-normal text-muted-foreground">
+                      (required)
+                    </span>
+                  </FieldLabel>
                   <Input
                     id="email"
                     type="email"
@@ -175,6 +207,7 @@ export function RegisterPage() {
                     onBlur={handleBlur("email")}
                     aria-invalid={!!fieldErrors.email || undefined}
                     aria-describedby={fieldErrors.email ? "email-error" : undefined}
+                    className="md:h-9 md:px-3 md:text-sm"
                     required
                   />
                   {fieldErrors.email && (
@@ -195,6 +228,7 @@ export function RegisterPage() {
                     onBlur={handleBlur("phone")}
                     aria-invalid={!!fieldErrors.phone || undefined}
                     aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
+                    className="md:h-9 md:px-3 md:text-sm"
                   />
                   {fieldErrors.phone && (
                     <FieldError id="phone-error">{fieldErrors.phone}</FieldError>
@@ -203,7 +237,12 @@ export function RegisterPage() {
               </Field>
               <Field>
                 <FieldContent>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">
+                    Password
+                    <span className="font-normal text-muted-foreground">
+                      (required)
+                    </span>
+                  </FieldLabel>
                   <div className="relative">
                     <Input
                       id="password"
@@ -214,9 +253,11 @@ export function RegisterPage() {
                       onBlur={handleBlur("password")}
                       aria-invalid={!!fieldErrors.password || undefined}
                       aria-describedby={
-                        fieldErrors.password ? "password-error" : undefined
+                        fieldErrors.password
+                          ? "password-error"
+                          : "password-description"
                       }
-                      className="pr-10"
+                      className="pr-10 md:h-9 md:px-3 md:text-sm"
                       required
                     />
                     <Button
@@ -235,12 +276,20 @@ export function RegisterPage() {
                       {fieldErrors.password}
                     </FieldError>
                   )}
+                  {!fieldErrors.password && (
+                    <FieldDescription id="password-description">
+                      At least 8 characters.
+                    </FieldDescription>
+                  )}
                 </FieldContent>
               </Field>
               <Field>
                 <FieldContent>
                   <FieldLabel htmlFor="password_confirmation">
                     Confirm Password
+                    <span className="font-normal text-muted-foreground">
+                      (required)
+                    </span>
                   </FieldLabel>
                   <div className="relative">
                     <Input
@@ -256,7 +305,7 @@ export function RegisterPage() {
                           ? "password-confirmation-error"
                           : undefined
                       }
-                      className="pr-10"
+                      className="pr-10 md:h-9 md:px-3 md:text-sm"
                       required
                     />
                     <Button
@@ -277,14 +326,10 @@ export function RegisterPage() {
                   )}
                 </FieldContent>
               </Field>
-              {error && (
-                <p className="text-xs text-destructive" role="alert">
-                  {error}
-                </p>
-              )}
             </CardContent>
             <CardFooter className="flex-col gap-3">
               <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? "Creating..." : "Register"}
               </Button>
               <p className="text-xs text-muted-foreground">
