@@ -191,36 +191,59 @@ export function AppointmentsListPage() {
         </div>
       </div>
 
-      <div className="rounded-none border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Patient</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {appointmentQuery.isLoading && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            )}
-            {!appointmentQuery.isLoading && appointments.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="text-center text-muted-foreground"
-                >
-                  No appointments found.
-                </TableCell>
-              </TableRow>
-            )}
+      {appointmentQuery.isLoading && (
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      )}
+      {!appointmentQuery.isLoading && appointments.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No appointments found.
+        </p>
+      )}
+      {!appointmentQuery.isLoading && appointments.length > 0 && (
+        <>
+          <div className="hidden rounded-none border md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Patient</TableHead>
+                  <TableHead>Service</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {appointments.map((appointment) => (
+                  <TableRow
+                    key={appointment.id}
+                    role="link"
+                    tabIndex={0}
+                    onClick={() =>
+                      navigate(`/appointments/${appointment.id}`)
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        navigate(`/appointments/${appointment.id}`)
+                      }
+                    }}
+                    aria-label={`View appointment for ${appointment.patient?.name ?? "this patient"} on ${formatDate(appointment.appointment_date)}`}
+                    className="cursor-pointer"
+                  >
+                    <TableCell>{appointment.patient?.name ?? "-"}</TableCell>
+                    <TableCell>{appointment.service?.title ?? "-"}</TableCell>
+                    <TableCell>
+                      {formatDate(appointment.appointment_date)}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={appointment.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="grid gap-2 md:hidden">
             {appointments.map((appointment) => (
-              <TableRow
+              <div
                 key={appointment.id}
                 role="link"
                 tabIndex={0}
@@ -231,21 +254,23 @@ export function AppointmentsListPage() {
                   }
                 }}
                 aria-label={`View appointment for ${appointment.patient?.name ?? "this patient"} on ${formatDate(appointment.appointment_date)}`}
-                className="cursor-pointer"
+                className="cursor-pointer rounded-none border p-3"
               >
-                <TableCell>{appointment.patient?.name ?? "-"}</TableCell>
-                <TableCell>{appointment.service?.title ?? "-"}</TableCell>
-                <TableCell>
-                  {formatDate(appointment.appointment_date)}
-                </TableCell>
-                <TableCell>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-sm font-medium">
+                    {appointment.patient?.name ?? "Patient"}
+                  </p>
                   <StatusBadge status={appointment.status} />
-                </TableCell>
-              </TableRow>
+                </div>
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {appointment.service?.title ?? "Service"} ·{" "}
+                  {formatDate(appointment.appointment_date)}
+                </p>
+              </div>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
 
       {paginated && (
         <Pagination
