@@ -335,72 +335,74 @@ export function AppointmentDetailPage() {
     </div>
   )
 
-  const managePanel = (
-    <>
-      {appointment.status !== "completed" && (
-        <>
-          <section className="grid gap-3">
-            <DateTimePicker
-              value={rescheduleDate}
-              onChange={setRescheduleDate}
-              minDate={rescheduleMin}
-            />
-            <Button
-              onClick={() => rescheduleMutation.mutate()}
-              disabled={rescheduleMutation.isPending || !rescheduleDate}
-            >
-              {rescheduleMutation.isPending && (
-                <Loader2Icon className="size-4 animate-spin" />
-              )}
-              Save Reschedule
-            </Button>
-            {rescheduleMutation.isError && (
-              <p className="text-xs text-destructive">
-                {extractError(rescheduleMutation.error)}
-              </p>
-            )}
-          </section>
-          <div className="h-px bg-border" />
-        </>
-      )}
-
-      <section className="grid gap-3">
-        <div className="grid gap-2">
-          <Label htmlFor="reason">Reason</Label>
-          <Input
-            id="reason"
-            placeholder="Required"
-            value={cancellationReason}
-            onChange={(e) => setCancellationReason(e.target.value)}
+  const managePanel =
+    appointment.status === "completed" ? (
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <CheckCircle2Icon className="size-4 text-primary" />
+        This appointment has been completed.
+      </p>
+    ) : (
+      <>
+        <section className="grid gap-3">
+          <DateTimePicker
+            value={rescheduleDate}
+            onChange={setRescheduleDate}
+            minDate={rescheduleMin}
           />
-        </div>
-        <Button
-          variant="destructive"
-          onClick={() => setCancelOpen(true)}
-          disabled={cancelMutation.isPending || !cancellationReason.trim()}
-        >
-          {cancelMutation.isPending && (
-            <Loader2Icon className="size-4 animate-spin" />
+          <Button
+            onClick={() => rescheduleMutation.mutate()}
+            disabled={rescheduleMutation.isPending || !rescheduleDate}
+          >
+            {rescheduleMutation.isPending && (
+              <Loader2Icon className="size-4 animate-spin" />
+            )}
+            Save Reschedule
+          </Button>
+          {rescheduleMutation.isError && (
+            <p className="text-xs text-destructive">
+              {extractError(rescheduleMutation.error)}
+            </p>
           )}
-          Cancel Appointment
-        </Button>
-        {cancelMutation.isError && (
-          <p className="text-xs text-destructive">
-            {extractError(cancelMutation.error)}
-          </p>
-        )}
-      </section>
-      <ConfirmDialog
-        open={cancelOpen}
-        onOpenChange={setCancelOpen}
-        title="Cancel appointment?"
-        description={`Cancel the appointment for ${appointment.service?.title ?? "this service"} on ${formatDate(appointment.appointment_date)}? This cannot be undone.`}
-        confirmLabel="Cancel Appointment"
-        pending={cancelMutation.isPending}
-        onConfirm={() => cancelMutation.mutate()}
-      />
-    </>
-  )
+        </section>
+        <div className="h-px bg-border" />
+
+        <section className="grid gap-3">
+          <div className="grid gap-2">
+            <Label htmlFor="reason">Reason</Label>
+            <Input
+              id="reason"
+              placeholder="Required"
+              value={cancellationReason}
+              onChange={(e) => setCancellationReason(e.target.value)}
+            />
+          </div>
+          <Button
+            variant="destructive"
+            onClick={() => setCancelOpen(true)}
+            disabled={cancelMutation.isPending || !cancellationReason.trim()}
+          >
+            {cancelMutation.isPending && (
+              <Loader2Icon className="size-4 animate-spin" />
+            )}
+            Cancel Appointment
+          </Button>
+          {cancelMutation.isError && (
+            <p className="text-xs text-destructive">
+              {extractError(cancelMutation.error)}
+            </p>
+          )}
+        </section>
+        <ConfirmDialog
+          open={cancelOpen}
+          onOpenChange={setCancelOpen}
+          title="Cancel appointment?"
+          description={`Cancel the appointment for ${appointment.service?.title ?? "this service"} on ${formatDate(appointment.appointment_date)}? This cannot be undone.`}
+          confirmLabel="Cancel Appointment"
+          pending={cancelMutation.isPending}
+          onConfirm={() => cancelMutation.mutate()}
+        />
+      </>
+    )
 
   if (isAdmin) {
     if (appointment.status === "cancelled") {
