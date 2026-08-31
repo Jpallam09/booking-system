@@ -67,79 +67,93 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Create Account</CardTitle>
-          <CardDescription>Register as a patient.</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={form.name}
-                onChange={update("name")}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={update("email")}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone (optional)</Label>
-              <Input id="phone" value={form.phone} onChange={update("phone")} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={form.password}
-                onChange={update("password")}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
-              <Input
-                id="password_confirmation"
-                type="password"
-                value={form.password_confirmation}
-                onChange={update("password_confirmation")}
-                required
-              />
-            </div>
-            {error && (
-              <p className="text-xs text-destructive" role="alert">
-                {error}
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <div className="grid w-full max-w-sm gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link to="/" />}
+          className="justify-self-start"
+        >
+          Back
+        </Button>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>Create Account</CardTitle>
+            <CardDescription>Register as a patient.</CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  value={form.name}
+                  onChange={update("name")}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={update("email")}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone (optional)</Label>
+                <Input
+                  id="phone"
+                  value={form.phone}
+                  onChange={update("phone")}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={form.password}
+                  onChange={update("password")}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password_confirmation">Confirm Password</Label>
+                <Input
+                  id="password_confirmation"
+                  type="password"
+                  value={form.password_confirmation}
+                  onChange={update("password_confirmation")}
+                  required
+                />
+              </div>
+              {error && (
+                <p className="text-xs text-destructive" role="alert">
+                  {error}
+                </p>
+              )}
+            </CardContent>
+            <CardFooter className="flex-col gap-3">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Creating..." : "Register"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  to={`/login${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`}
+                  className="text-primary underline underline-offset-4"
+                >
+                  Sign In
+                </Link>
               </p>
-            )}
-          </CardContent>
-          <CardFooter className="flex-col gap-3">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating..." : "Register"}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Already have an account?{" "}
-              <Link
-                to={`/login${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ""}`}
-                className="text-primary underline underline-offset-4"
-              >
-                Sign In
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
     </div>
   )
 }
