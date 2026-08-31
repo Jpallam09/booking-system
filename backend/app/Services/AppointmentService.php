@@ -83,6 +83,10 @@ class AppointmentService
             throw new AuthorizationException('You can only update your own appointments.');
         }
 
+        if (in_array($appointment->status, [AppointmentStatus::Completed, AppointmentStatus::Cancelled], true)) {
+            throw new AuthorizationException('Completed or cancelled appointments cannot be updated.');
+        }
+
         if (!empty($data['appointment_date'])) {
             $appointment->appointment_date = $data['appointment_date'];
         }
@@ -144,6 +148,14 @@ class AppointmentService
 
         if (!$isAdmin && !$isOwner) {
             throw new AuthorizationException('Only the patient or an admin can cancel this appointment.');
+        }
+
+        if ($appointment->status === AppointmentStatus::Completed) {
+            throw new AuthorizationException('Completed appointments cannot be cancelled.');
+        }
+
+        if ($appointment->status === AppointmentStatus::Cancelled) {
+            throw new AuthorizationException('This appointment has already been cancelled.');
         }
 
         $appointment->status = AppointmentStatus::Cancelled;

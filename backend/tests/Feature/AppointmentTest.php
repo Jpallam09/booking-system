@@ -347,4 +347,65 @@ class AppointmentTest extends TestCase
             ->assertJsonPath('data.status', 'cancelled')
             ->assertJsonPath('data.cancelled_by', $admin->name);
     }
+
+    public function test_patient_cannot_cancel_completed_appointment(): void
+    {
+        $patient = $this->actingAsRole(UserRole::Patient);
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create([
+            'patient_id' => $patient->id,
+            'service_id' => $service->id,
+            'status' => AppointmentStatus::Completed,
+        ]);
+
+        $this->postJson("/api/appointments/{$appointment->id}/cancel", ['cancellation_reason' => 'Change of plans'])->assertForbidden();
+
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'status' => 'completed']);
+    }
+
+    public function test_admin_cannot_cancel_completed_appointment(): void
+    {
+        $this->actingAsRole(UserRole::Admin);
+        $patient = User::factory()->role(UserRole::Patient)->create();
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create([
+            'patient_id' => $patient->id,
+            'service_id' => $service->id,
+            'status' => AppointmentStatus::Completed,
+        ]);
+
+        $this->postJson("/api/appointments/{$appointment->id}/cancel", ['cancellation_reason' => 'Dentist unavailable'])->assertForbidden();
+
+        $this->assertDatabaseHas('appointments', ['id' => $appointment->id, 'status' => 'completed']);
+    }
+
+    public function test_patient_cannot_cancel_already_cancelled_appointment(): void
+    {
+        $patient = $this->actingAsRole(UserRole::Patient);
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create([
+            'patient_id' => $patient->id,
+            'service_id' => $service->id,
+            'status' => AppointmentStatus::Cancelled,
+        ]);
+
+        $this->postJson("/api/appointments/{$appointment->id}/cancel", ['cancellation_reason' => 'Change of plans'])->assertForbidden();
+    }
+
+    public function test_patient_cannot_update_completed_appointment(): void
+    {
+        $patient = $this->actingAsRole(UserRole::Patient);
+        $service = $this->makeService();
+        $appointment = Appointment::factory()->create([
+            'patient_id' => $patient->id,
+            'service_id' => $service->id,
+            'status' => AppointmentStatus::Completed,
+        ]);
+
+        $this->putJson("/api/appointments/{$appointment->id}", [
+            'appointment_date' => $this->futureDate(),
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('appointments', ['id' => $appointment->id, 'appointment_date' => $this->futureDate()]);
+    }
 }
