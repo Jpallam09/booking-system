@@ -44,6 +44,15 @@ export function ServicesListPage() {
     setPage(1)
   }
 
+  const resetFilters = () => {
+    setSearch("")
+    setStatus("")
+    setMinPrice("")
+    setMaxPrice("")
+    setAppliedParams({})
+    setPage(1)
+  }
+
   const paginated = query.data
   const services = paginated?.data ?? []
 
@@ -61,8 +70,8 @@ export function ServicesListPage() {
         )}
       </div>
 
-      <div className="grid gap-3 rounded-none border p-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="grid gap-1.5 lg:col-span-1">
+      <div className="grid gap-3 rounded-none border p-4 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="grid gap-1.5 lg:col-span-2">
           <Label htmlFor="search">Search</Label>
           <Input
             id="search"
@@ -107,8 +116,11 @@ export function ServicesListPage() {
             onChange={(e) => setMaxPrice(e.target.value)}
           />
         </div>
-        <div className="flex items-end">
-          <Button onClick={applyFilters} className="w-full">
+        <div className="flex items-center justify-end gap-2 sm:col-span-2 lg:col-span-6">
+          <Button onClick={resetFilters} variant="outline">
+            Reset
+          </Button>
+          <Button onClick={applyFilters}>
             Apply
           </Button>
         </div>

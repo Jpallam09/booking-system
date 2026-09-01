@@ -80,6 +80,15 @@ export function AppointmentsListPage() {
     setSearchParams(params)
   }
 
+  const resetFilters = () => {
+    setSearch("")
+    setStatus("")
+    setServiceId("")
+    setFrom("")
+    setTo("")
+    setSearchParams({})
+  }
+
   const setPage = (next: number) => {
     const params = Object.fromEntries(searchParams.entries())
     params.page = String(next)
@@ -184,8 +193,11 @@ export function AppointmentsListPage() {
             onChange={(e) => setTo(e.target.value)}
           />
         </div>
-        <div className="flex items-end">
-          <Button onClick={applyFilters} className="w-full">
+        <div className="flex items-end justify-end gap-2 sm:col-span-2 lg:col-span-6">
+          <Button onClick={resetFilters} variant="outline">
+            Reset
+          </Button>
+          <Button onClick={applyFilters}>
             Apply
           </Button>
         </div>
