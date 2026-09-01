@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class AppointmentService
 {
+    public function __construct(private EmailService $emailService)
+    {
+    }
+
     public function getFilteredAppointments(array $filters)
     {
         $user = Auth::user();
@@ -68,13 +72,17 @@ class AppointmentService
             throw new AuthorizationException('Only patients can book appointments.');
         }
 
-        return Appointment::create([
+        $appointment = Appointment::create([
             'patient_id' => $user->id,
             'service_id' => $data['service_id'],
             'appointment_date' => $data['appointment_date'],
             'dental_concern' => $data['dental_concern'] ?? null,
             'status' => AppointmentStatus::Pending,
         ]);
+
+        $this->emailService->sendAppointmentEmail($appointment, 'created');
+
+        return $appointment;
     }
 
     public function updateAppointment(Appointment $appointment, array $data, User $user): Appointment
@@ -87,6 +95,8 @@ class AppointmentService
             throw new AuthorizationException('Completed or cancelled appointments cannot be updated.');
         }
 
+        $dateChanged = !empty($data['appointment_date']) && $data['appointment_date'] !== $appointment->appointment_date?->toDateTimeString();
+
         if (!empty($data['appointment_date'])) {
             $appointment->appointment_date = $data['appointment_date'];
         }
@@ -96,6 +106,10 @@ class AppointmentService
         }
 
         $appointment->save();
+
+        if ($dateChanged) {
+            $this->emailService->sendAppointmentEmail($appointment->fresh(['patient', 'dentist', 'service']), 'rescheduled');
+        }
 
         return $appointment;
     }
@@ -138,6 +152,8 @@ class AppointmentService
         $appointment->status = $status;
         $appointment->save();
 
+        $this->emailService->sendAppointmentEmail($appointment->fresh(['patient', 'dentist', 'service']), $status->value);
+
         return $appointment;
     }
 
@@ -162,6 +178,8 @@ class AppointmentService
         $appointment->cancellation_reason = $reason;
         $appointment->cancelled_by = $user->name;
         $appointment->save();
+
+        $this->emailService->sendAppointmentEmail($appointment->fresh(['patient', 'dentist', 'service']), 'cancelled');
 
         return $appointment;
     }

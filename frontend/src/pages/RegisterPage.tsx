@@ -118,6 +118,7 @@ export function RegisterPage() {
         email: form.email,
         password: form.password,
         password_confirmation: form.password_confirmation,
+        phone: form.phone || undefined,
       })
       setAuth(token, data)
       navigate(redirect, { replace: true })
