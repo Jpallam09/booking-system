@@ -6,6 +6,8 @@ export interface User {
   email: string
   phone: string | null
   role: UserRole
+  google_id?: string | null
+  avatar?: string | null
   created_at: string
   updated_at: string
 }

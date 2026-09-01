@@ -10,6 +10,7 @@ import { DashboardPage } from "@/pages/DashboardPage"
 import { LandingPage } from "@/pages/LandingPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { NewAppointmentPage } from "@/pages/NewAppointmentPage"
+import { OAuthCallbackPage } from "@/pages/OAuthCallbackPage"
 import { RegisterPage } from "@/pages/RegisterPage"
 import { ServiceDetailPage } from "@/pages/ServiceDetailPage"
 import { ServicesListPage } from "@/pages/ServicesListPage"
@@ -28,6 +29,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
             <Route
               element={

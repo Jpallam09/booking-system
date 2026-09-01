@@ -19,6 +19,7 @@ interface AuthContextValue {
   login: (payload: LoginPayload) => Promise<User>
   logout: () => Promise<void>
   setUser: (user: User) => void
+  handleOAuthLogin: (token: string, user: User) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -48,6 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (current) setAuth(current, next)
   }, [])
 
+  const handleOAuthLogin = useCallback((token: string, user: User) => {
+    setAuth(token, user)
+    setUserState(user)
+    setToken(token)
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       if (token) await logoutApi()
@@ -67,8 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       setUser,
+      handleOAuthLogin,
     }),
-    [user, token, login, logout, setUser]
+    [user, token, login, logout, setUser, handleOAuthLogin]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

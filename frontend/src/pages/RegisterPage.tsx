@@ -5,6 +5,7 @@ import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react"
 import { register } from "@/api/auth"
 import { setAuth } from "@/lib/auth"
 import { AuthLayout } from "@/components/shared/AuthLayout"
+import { GoogleButton } from "@/components/shared/GoogleButton"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -155,6 +156,12 @@ export function RegisterPage() {
         </CardHeader>
           <form onSubmit={handleSubmit} noValidate>
             <CardContent className="grid gap-3">
+              <GoogleButton label="Sign up with Google" />
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" />
+                <span>or</span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
               {summaryMessage && (
                 <div
                   ref={summaryRef}

@@ -25,3 +25,8 @@ export async function fetchCurrentUser(): Promise<User> {
   const { data } = await api.get<User>("/user")
   return data
 }
+
+export async function getGoogleAuthUrl(): Promise<string> {
+  const { data } = await api.get<{ url: string }>("/auth/google/redirect")
+  return data.url
+}
